@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 from flask import Flask, session, request
 from functools import wraps, partial
-from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, LTI_STAFF_ROLES, verify_request_common, LTIException,LTINotInSessionException
+from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, LTI_STAFF_ROLES, verify_request_common, post_message,LTIException,LTINotInSessionException
+from lxml import etree
 
 import logging
 log = logging.getLogger('pylti.flask')
@@ -49,6 +50,28 @@ class LTI():
         consumers = config.get('consumers',dict())
         return consumers
 
+    def key(self):
+        return session['oauth_consumer_key']
+
+    def message_identifier_id(self):
+        return "edX_fix"
+
+    def lis_result_sourcedid(self):
+        return session['lis_result_sourcedid']
+
+
+    def response_url(self):
+        url = session['lis_outcome_service_url']
+        app_config = self.lti_kwargs['app'].config
+        urls = app_config.get('PYLTI_URL_FIX',dict())
+        ## url remapping is useful for using devstack
+        ## devstack reports httpS://localhost:8000/ and listens on HTTP
+        for prefix, map in urls.iteritems():
+           if url.startswith( prefix):
+               for _from, _to in map.iteritems():
+                   url = url.replace(_from,_to)
+        return url
+
     def verify_request(self):
         if request.method == 'POST':
             params = request.form.to_dict()
@@ -64,6 +87,7 @@ class LTI():
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
+                    log.debug( "params {}={}".format( prop,params.get(prop, None) ))
                     session[prop] = params[prop]
 
             # Set logged in session key
@@ -78,7 +102,47 @@ class LTI():
             session[LTI_SESSION_KEY] = False
             raise LTIException
 
+    def generate_request_xml(self,message_identifier_id,operation,lis_result_sourcedid,score):
+        root = etree.Element('imsx_POXEnvelopeRequest', xmlns =
+                    'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
+
+        header = etree.SubElement(root, 'imsx_POXHeader')
+        header_info = etree.SubElement(header, 'imsx_POXRequestHeaderInfo')
+        version = etree.SubElement(header_info, 'imsx_version')
+        version.text = 'V1.0'
+        message_identifier = etree.SubElement(header_info,
+                'imsx_messageIdentifier')
+        message_identifier.text = message_identifier_id
+        body = etree.SubElement(root, 'imsx_POXBody')
+        request = etree.SubElement(body, '%s%s' %(operation,
+            'Request'))
+        record = etree.SubElement(request, 'resultRecord')
+
+        guid = etree.SubElement(record, 'sourcedGUID')
+
+        sourcedid = etree.SubElement(guid, 'sourcedId')
+        sourcedid.text = lis_result_sourcedid
+        if not (score is None):
+            result = etree.SubElement(record, 'result')
+            result_score = etree.SubElement(result, 'resultScore')
+            language = etree.SubElement(result_score, 'language')
+            language.text = 'en'
+            text_string = etree.SubElement(result_score, 'textString')
+            text_string.text = score.__str__()
+        log.debug( "XML Response: \n{}".format(etree.tostring(root, xml_declaration = True, encoding = 'utf-8')))
+        return etree.tostring(root, xml_declaration = True, encoding = 'utf-8')
+
     def post_grade(self, grade):
+        message_identifier_id = 'message_identifier_id'
+        operation = 'replaceResult'
+        lis_result_sourcedid = self.lis_result_sourcedid()
+        ## edX devbox fix
+        score = float(grade)
+        if score <= 1.0 and score >= 0:
+            xml = self.generate_request_xml(message_identifier_id,operation,lis_result_sourcedid,score)
+            post_message(self._consumers(),self.key(),self.response_url(),xml)
+            return True
+
         print "Grade {}".format(grade)
         return False
 

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 """
 Classes to handle oauth portion of LTI
 """
@@ -7,11 +8,13 @@ import logging
 # pylint: disable=C0103
 from functools import wraps
 
+import oauth2
 from flask import Flask, session, request
 
 import oauth.oauth as oauth
 
 log = logging.getLogger('pylti.common')
+
 
 class LTIOAuthDataStore(oauth.OAuthDataStore):
     """
@@ -19,7 +22,7 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
     for app engine at https://code.google.com/p/ims-dev/
     """
 
-    def __init__(self,consumers):
+    def __init__(self, consumers):
         """
         Create OAuth store
         """
@@ -68,9 +71,11 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
         """We don't do request_tokens"""
         return None  # pragma: no cover
 
+
 """
 Utility support functions
 """
+
 
 class LTIException(Exception):
     """
@@ -79,6 +84,7 @@ class LTIException(Exception):
     """
     pass
 
+
 class LTINotInSessionException(LTIException):
     """
     Custom LTI exception for proper handling
@@ -86,12 +92,14 @@ class LTINotInSessionException(LTIException):
     """
     pass
 
+
 class LTIRoleException(LTIException):
     """
     Exception class for when LTI user doesn't have the
     right role.
     """
     pass
+
 
 """
 Decorators to handle LTI session management,
@@ -117,6 +125,7 @@ LTI_PROPERTY_LIST = [
     'lti_message',
     'lti_version',
     'roles',
+    'lis_outcome_service_url'
 ]
 
 LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
@@ -124,7 +133,56 @@ LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
 LTI_SESSION_KEY = 'lti_authenticated'
 
 
-def verify_request_common(consumers,url,method,headers,params):
+def post_message(consumers, lti_key, url, body):
+    oauth_store = LTIOAuthDataStore(consumers)
+    oauth_server = oauth.OAuthServer(oauth_store)
+    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
+    c = oauth_store.lookup_consumer(lti_key)
+    secret = c.secret
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+    # monkey_patch_headers ensures that Authorization header is NOT lower cased
+    monkey_patch_headers = True
+    monkey_patch_function = None
+    if monkey_patch_headers:
+        import httplib2
+
+        http = httplib2.Http
+        normalize = http._normalize_headers
+
+        def my_normalize(self, headers):
+            ret = normalize(self, headers)
+            if ret.has_key('authorization'):
+                ret['Authorization'] = ret.pop('authorization')
+            log.debug("headers")
+            log.debug(headers)
+            return ret
+
+        http._normalize_headers = my_normalize
+        monkey_patch_function = normalize
+
+    response, content = client.request(
+        url,
+        'POST',
+        body=body,
+        headers={'Content-Type': 'application/xml'})
+
+    if monkey_patch_headers and monkey_patch_function:
+        import httplib2
+
+        http = httplib2.Http
+        http._normalize_headers = monkey_patch_function
+    log.debug("key {}".format(lti_key))
+    log.debug("secret {}".format(secret))
+    log.debug("url {}".format(url))
+    log.debug(body)
+    log.debug(response)
+    # log.debug(content)
+
+    pass
+
+
+def verify_request_common(consumers, url, method, headers, params):
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(
@@ -158,6 +216,7 @@ def verify_request_common(consumers,url,method,headers,params):
 
     return True
 
+
 def lti_staff_required(func):
     """
     Decorator to make sure that person is a
@@ -165,6 +224,7 @@ def lti_staff_required(func):
     before allowing them to the view. Requires that
     lti_authentication has occurred
     """
+
     @wraps(func)
     def decorator(*args, **kwargs):
         """

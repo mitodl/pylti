@@ -1,20 +1,15 @@
 from __future__ import absolute_import
 
+import logging
+from functools import wraps
+import oauth2
+from flask import session
+import oauth.oauth as oauth
+
+log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 """
 Classes to handle oauth portion of LTI
 """
-# pylint: disable=C0103
-import logging
-# pylint: disable=C0103
-from functools import wraps
-
-import oauth2
-from flask import Flask, session, request
-
-import oauth.oauth as oauth
-
-log = logging.getLogger('pylti.common')
-
 
 class LTIOAuthDataStore(oauth.OAuthDataStore):
     """
@@ -50,9 +45,8 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
             return None
         return oauth.OAuthConsumer(key, secret)
 
-    def lookup_token(self, oauth_consumer, token_type, token):
+    def lookup_token(self, oauth_consumer, token_type, token):  # pylint: disable=unused-argument
         """We don't do request_tokens"""
-        # pylint: disable=W0613
         return oauth.OAuthToken(None, None)  # pragma: no cover
 
     def lookup_nonce(self, oauth_consumer, oauth_token, nonce):
@@ -72,10 +66,10 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
         return None  # pragma: no cover
 
 
+#pylint: disable=pointless-string-statement
 """
 Utility support functions
 """
-
 
 class LTIException(Exception):
     """
@@ -132,13 +126,12 @@ LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
 
 LTI_SESSION_KEY = 'lti_authenticated'
 
-
 def post_message(consumers, lti_key, url, body):
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
-    c = oauth_store.lookup_consumer(lti_key)
-    secret = c.secret
+    lti_consumer = oauth_store.lookup_consumer(lti_key)
+    secret = lti_consumer.secret
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
     # monkey_patch_headers ensures that Authorization header is NOT lower cased
@@ -148,6 +141,7 @@ def post_message(consumers, lti_key, url, body):
         import httplib2
 
         http = httplib2.Http
+        #pylint: disable=protected-access
         normalize = http._normalize_headers
 
         def my_normalize(self, headers):
@@ -161,6 +155,7 @@ def post_message(consumers, lti_key, url, body):
         http._normalize_headers = my_normalize
         monkey_patch_function = normalize
 
+    #pylint: disable=unused-variable
     response, content = client.request(
         url,
         'POST',
@@ -171,7 +166,10 @@ def post_message(consumers, lti_key, url, body):
         import httplib2
 
         http = httplib2.Http
+        #pylint: disable=protected-access
         http._normalize_headers = monkey_patch_function
+
+    #TODO: inspect content and return True if success
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
@@ -179,7 +177,6 @@ def post_message(consumers, lti_key, url, body):
     log.debug(response)
     # log.debug(content)
 
-    pass
 
 
 def verify_request_common(consumers, url, method, headers, params):
@@ -206,6 +203,7 @@ def verify_request_common(consumers, url, method, headers, params):
         raise LTIException('This page requires a valid oauth session '
                            'or request')
     try:
+        #pylint: disable=protected-access
         consumer = oauth_server._get_consumer(oauth_request)
         oauth_server._check_signature(oauth_request, consumer, None)
     except oauth.OAuthError as err:

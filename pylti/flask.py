@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+    PyLTI decorator implementation for flask framework
+"""
 from __future__ import absolute_import
 from flask import session, request
 from functools import wraps, partial
@@ -13,14 +17,15 @@ log = logging.getLogger('pylti.flask') # pylint: disable=invalid-name
 # request = 'any' || 'initial' || 'session'
 
 class LTIVerificationFailedException(Exception):
+    """
+    LTI Verification failed exception
+    """
     pass
-
 
 class LTI(object):
     def __init__(self, lti_args, lti_kwargs):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
-
         self.nickname = 'nickname'
 
     def verify(self):
@@ -162,7 +167,7 @@ class LTI(object):
 
 
 def lti(*lti_args, **lti_kwargs):
-    def _lti(function, lti_args=[], lti_kwargs=dict()): #pylint: disable=dangerous-default-value
+    def _lti(function, lti_args=None, lti_kwargs=None):
         @wraps(function)
         def wrapper(*args, **kwargs):
             try:
@@ -185,7 +190,7 @@ def lti(*lti_args, **lti_kwargs):
     if len(lti_args) == 1 and callable(lti_args[0]):
         # No arguments, this is the decorator
         # Set default values for the arguments
-        ret = _lti(lti_args[0])
+        ret = _lti(lti_args[0], lti_args=[], lti_kwargs=dict())
     else:
         ret = partial(_lti, *lti_args, lti_args=lti_args, lti_kwargs=lti_kwargs)
 

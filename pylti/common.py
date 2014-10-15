@@ -1,5 +1,9 @@
-from __future__ import absolute_import
+# -*- coding: utf-8 -*-
+"""
+Common classes and methods for PyLTI module
+"""
 
+from __future__ import absolute_import
 import logging
 from functools import wraps
 import oauth2
@@ -7,6 +11,7 @@ from flask import session
 import oauth.oauth as oauth
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
+
 """
 Classes to handle oauth portion of LTI
 """
@@ -126,25 +131,27 @@ LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
 
 LTI_SESSION_KEY = 'lti_authenticated'
 
-def post_message(consumers, lti_key, url, body):
-    oauth_store = LTIOAuthDataStore(consumers)
-    oauth_server = oauth.OAuthServer(oauth_store)
-    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
-    lti_consumer = oauth_store.lookup_consumer(lti_key)
-    secret = lti_consumer.secret
-    consumer = oauth2.Consumer(key=lti_key, secret=secret)
-    client = oauth2.Client(consumer)
-    # monkey_patch_headers ensures that Authorization header is NOT lower cased
+
+def _post_patched_request(body, client, url):
+    """
+    Authorization header needs to be capitalized for some LTI clients
+    this function ensures that header is capitalized
+    :param body: body of the call
+    :param client: OAuth Client
+    :param url: outcome url
+    :return: response
+    """
     monkey_patch_headers = True
     monkey_patch_function = None
     if monkey_patch_headers:
         import httplib2
 
         http = httplib2.Http
-        #pylint: disable=protected-access
+        # pylint: disable=protected-access
         normalize = http._normalize_headers
 
         def my_normalize(self, headers):
+            """ This function patches Authorization header """
             ret = normalize(self, headers)
             if ret.has_key('authorization'):
                 ret['Authorization'] = ret.pop('authorization')
@@ -155,13 +162,12 @@ def post_message(consumers, lti_key, url, body):
         http._normalize_headers = my_normalize
         monkey_patch_function = normalize
 
-    #pylint: disable=unused-variable
+    # pylint: disable=unused-variable
     response, content = client.request(
         url,
         'POST',
         body=body,
         headers={'Content-Type': 'application/xml'})
-
     if monkey_patch_headers and monkey_patch_function:
         import httplib2
 
@@ -169,6 +175,27 @@ def post_message(consumers, lti_key, url, body):
         #pylint: disable=protected-access
         http._normalize_headers = monkey_patch_function
 
+    return response
+
+
+def post_message(consumers, lti_key, url, body):
+    """
+        Posts a signed message to LTI consumer
+    :param consumers: consumers from config
+    :param lti_key: key to find appropriate consumer
+    :param url: post url
+    :param body: xml body
+    :return: success
+    """
+    oauth_store = LTIOAuthDataStore(consumers)
+    oauth_server = oauth.OAuthServer(oauth_store)
+    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
+    lti_consumer = oauth_store.lookup_consumer(lti_key)
+    secret = lti_consumer.secret
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+    # monkey_patch_headers ensures that Authorization header is NOT lower cased
+    response = _post_patched_request(body, client, url)
     #TODO: inspect content and return True if success
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
@@ -176,10 +203,19 @@ def post_message(consumers, lti_key, url, body):
     log.debug(body)
     log.debug(response)
     # log.debug(content)
+    return True
 
 
 
 def verify_request_common(consumers, url, method, headers, params):
+    """
+    :param consumers: consumers from config file
+    :param url: request url
+    :param method: request method
+    :param headers: request headers
+    :param params: request params
+    :return: is request valid
+    """
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(

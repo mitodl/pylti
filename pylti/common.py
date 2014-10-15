@@ -216,6 +216,12 @@ def verify_request_common(consumers, url, method, headers, params):
     :param params: request params
     :return: is request valid
     """
+
+    log.debug("consumers {}".format(consumers))
+    log.debug("url {}".format(url))
+    log.debug("method {}".format(method))
+    log.debug("headers {}".format(headers))
+    log.debug("params {}".format(params))
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(
@@ -245,7 +251,8 @@ def verify_request_common(consumers, url, method, headers, params):
     except oauth.OAuthError as err:
         # Rethrow our own for nice error handling (don't print
         # error message as it will contain the key
-        log.info(err.message)
+        print "exception:"
+        print err.args , err.message
         raise LTIException("OAuth error: Please check your key and secret")
 
     return True

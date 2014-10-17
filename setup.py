@@ -31,7 +31,8 @@ try:
             self.test_suite = True
             self.test_args = []
             if self.coverage:
-                self.test_args.append('--coverage')
+                self.test_args.append('--cov')
+                self.test_args.append('pylti')
 
         def run_tests(self):
             # import here, cause outside the eggs aren't loaded

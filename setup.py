@@ -48,9 +48,9 @@ try:
 #    console_scripts = ['pylti = pylti.cli:main']
     extra = dict(test_suite="pylti.tests",
                  tests_require= ["pytest-cov", "pytest-pep8", "pytest-flakes",
-                                 "pytest"],
+                                 "pytest","httpretty","flask"],
                  cmdclass={"test": PyTest},
-                 install_requires=[],
+                 install_requires=['oauth2','oauth','lxml','oauthlib'],
                  include_package_data=True,
                  #entry_points=dict(console_scripts=console_scripts),
                  zip_safe=False)

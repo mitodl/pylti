@@ -45,7 +45,6 @@ try:
             errno = pytest.main(self.test_args)
             sys.exit(errno)
 
-#    console_scripts = ['pylti = pylti.cli:main']
     extra = dict(test_suite="pylti.tests",
                  tests_require= ["pytest-cov", "pytest-pep8", "pytest-flakes",
                                  "pytest","httpretty","flask"],

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test pylti/common.py module
+Test pylti/test_common.py module
 """
 from pylti.common import LTIOAuthDataStore, verify_request_common, LTIException, post_message, generate_request_xml
 import unittest

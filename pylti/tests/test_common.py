@@ -2,20 +2,25 @@
 """
 Test pylti/test_common.py module
 """
-from pylti.common import LTIOAuthDataStore, verify_request_common, LTIException, post_message, generate_request_xml
+from pylti.common import (
+    LTIOAuthDataStore,
+    verify_request_common,
+    LTIException,
+    post_message,
+    generate_request_xml
+)
 import unittest
 from oauth import oauth
 import httpretty
 
 
 class TestCommon(unittest.TestCase):
-
     def test_LTIOAuthDataStore(self):
         consumers = {
             "key1": {"secret": "secret1"},
             "key2": {"secret": "secret2"},
             "key3": {"secret": "secret3"},
-            "keyNS": {"test":"mytest"}
+            "keyNS": {"test": "mytest"}
         }
         store = LTIOAuthDataStore(consumers)
         self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
@@ -59,7 +64,7 @@ class TestCommon(unittest.TestCase):
         import urlparse
 
         q = urlparse.urlparse(signature[0])
-        qs = urlparse.parse_qs(q.query,keep_blank_values=True)
+        qs = urlparse.parse_qs(q.query, keep_blank_values=True)
         verify_params = dict()
         for k, v in qs.iteritems():
             verify_params[k] = v[0]
@@ -99,7 +104,7 @@ class TestCommon(unittest.TestCase):
         import urlparse
 
         q = urlparse.urlparse(signature[0])
-        qs = urlparse.parse_qs(q.query,keep_blank_values=True)
+        qs = urlparse.parse_qs(q.query, keep_blank_values=True)
         verify_params = dict()
         for k, v in qs.iteritems():
             verify_params[k] = v[0]
@@ -154,23 +159,24 @@ class TestCommon(unittest.TestCase):
     @httpretty.activate
     def test_post_response(self):
         uri = 'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler'
-        def request_callback(request,uri,headers):
-            return (200,headers,"success")
+
+        def request_callback(request, uri, headers):
+            return (200, headers, "success")
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
         body = 'THIS_IS_RESPONSE'
-        post_message(consumers,"__consumer_key__", uri, body)
+        post_message(consumers, "__consumer_key__", uri, body)
 
     def test_generate_xml(self):
-        xml = generate_request_xml('message_identifier_id','operation','lis_result_sourcedid','score')
-        self.assertEqual(xml,"""<?xml version='1.0' encoding='utf-8'?>
+        xml = generate_request_xml('message_identifier_id', 'operation', 'lis_result_sourcedid', 'score')
+        self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
 <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID><result><resultScore><language>en</language><textString>score</textString></resultScore></result></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""");
-        xml = generate_request_xml('message_identifier_id','operation','lis_result_sourcedid',None)
-        self.assertEqual(xml,"""<?xml version='1.0' encoding='utf-8'?>
+        xml = generate_request_xml('message_identifier_id', 'operation', 'lis_result_sourcedid', None)
+        self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
 <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""")
 
-# if __name__ == '__main__':
-#     unittest.main()
+        # if __name__ == '__main__':
+        # unittest.main()

@@ -11,6 +11,33 @@ from lxml import etree
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 
+
+LTI_PROPERTY_LIST = [
+    'oauth_consumer_key',
+    'launch_presentation_return_url',
+    'user_id',
+    'oauth_nonce',
+    'context_label',
+    'context_id',
+    'resource_link_title',
+    'resource_link_id',
+    'lis_person_contact_email_primary',
+    'lis_person_contact_emailprimary',
+    'lis_person_name_full',
+    'lis_person_name_family',
+    'lis_person_name_given',
+    'lis_result_sourcedid',
+    'launch_type',
+    'lti_message',
+    'lti_version',
+    'roles',
+    'lis_outcome_service_url'
+]
+
+LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
+
+LTI_SESSION_KEY = 'lti_authenticated'
+
 """
 Classes to handle oauth portion of LTI
 """
@@ -74,38 +101,6 @@ class LTIRoleException(LTIException):
     right role.
     """
     pass
-
-
-"""
-Decorators to handle LTI session management,
-authentication, etc.
-"""
-
-LTI_PROPERTY_LIST = [
-    'oauth_consumer_key',
-    'launch_presentation_return_url',
-    'user_id',
-    'oauth_nonce',
-    'context_label',
-    'context_id',
-    'resource_link_title',
-    'resource_link_id',
-    'lis_person_contact_email_primary',
-    'lis_person_contact_emailprimary',
-    'lis_person_name_full',
-    'lis_person_name_family',
-    'lis_person_name_given',
-    'lis_result_sourcedid',
-    'launch_type',
-    'lti_message',
-    'lti_version',
-    'roles',
-    'lis_outcome_service_url'
-]
-
-LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
-
-LTI_SESSION_KEY = 'lti_authenticated'
 
 
 def _post_patched_request(body, client, url):

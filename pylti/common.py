@@ -52,12 +52,6 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
     def lookup_nonce(self, oauth_consumer, oauth_token, nonce):
         return None
 
-
-#pylint: disable=pointless-string-statement
-"""
-Utility support functions
-"""
-
 class LTIException(Exception):
     """
     Custom LTI exception for proper handling

@@ -1,4 +1,4 @@
-# http://travis-ci.org/#!/jtriley/StarCluster
+# http://travis-ci.org/#!/mitxlti/pylti
 language: python
 python:
     - 2.7

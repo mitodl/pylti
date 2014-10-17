@@ -7,8 +7,7 @@ from flask import session, request
 from functools import wraps, partial
 from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, \
     verify_request_common, post_message, \
-    LTIException, LTINotInSessionException
-from lxml import etree
+    LTIException, LTINotInSessionException, LTIRoleException, generate_request_xml
 
 import logging
 
@@ -37,7 +36,7 @@ class LTI(object):
         elif self.lti_kwargs.get('request') == 'any':
             self.verify_any()
         else:
-            raise LTIException()
+            raise LTIException("Unknown request type")
 
     def verify_any(self):
         log.debug('verify_any enter')
@@ -49,12 +48,14 @@ class LTI(object):
     def verify_session(self):
         if not session.get(LTI_SESSION_KEY, False):
             log.debug('verify_session failed')
-            raise LTINotInSessionException()
+            raise LTINotInSessionException('Session expired or unavailable')
 
     def _consumers(self):
         app_config = self.lti_kwargs['app'].config
         config = app_config.get('PYLTI_CONFIG', dict())
         consumers = config.get('consumers', dict())
+        print "CONFIG " , config
+        print "consumers " , consumers
         return consumers
 
     def key(self):
@@ -87,8 +88,9 @@ class LTI(object):
         log.debug(params)
 
         log.debug('verify_request?')
-        if verify_request_common(self._consumers(), request.url, \
-                                 request.method, request.headers, params):
+        try:
+            verify_request_common(self._consumers(), request.url, \
+                                 request.method, request.headers, params)
             log.debug('verify_request success')
 
             # All good to go, store all of the LTI params into a
@@ -102,61 +104,29 @@ class LTI(object):
             # Set logged in session key
             session[LTI_SESSION_KEY] = True
             return True
-        else:
+        except LTIException as e:
             log.debug('verify_request failed')
             for prop in LTI_PROPERTY_LIST:
                 if session.get(prop, None):
                     del session[prop]
 
             session[LTI_SESSION_KEY] = False
-            raise LTIException
-
-    def generate_request_xml(self, message_identifier_id, operation, \
-                             lis_result_sourcedid, score):
-        root = etree.Element('imsx_POXEnvelopeRequest', xmlns= \
-            'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
-
-        header = etree.SubElement(root, 'imsx_POXHeader')
-        header_info = etree.SubElement(header, 'imsx_POXRequestHeaderInfo')
-        version = etree.SubElement(header_info, 'imsx_version')
-        version.text = 'V1.0'
-        message_identifier = etree.SubElement(header_info,
-                                              'imsx_messageIdentifier')
-        message_identifier.text = message_identifier_id
-        body = etree.SubElement(root, 'imsx_POXBody')
-        xml_request = etree.SubElement(body, '%s%s' % (operation, 'Request'))
-        record = etree.SubElement(xml_request, 'resultRecord')
-
-        guid = etree.SubElement(record, 'sourcedGUID')
-
-        sourcedid = etree.SubElement(guid, 'sourcedId')
-        sourcedid.text = lis_result_sourcedid
-        if not score is None:
-            result = etree.SubElement(record, 'result')
-            result_score = etree.SubElement(result, 'resultScore')
-            language = etree.SubElement(result_score, 'language')
-            language.text = 'en'
-            text_string = etree.SubElement(result_score, 'textString')
-            text_string.text = score.__str__()
-        log.debug("XML Response: \n{}".format(\
-            etree.tostring(root, xml_declaration=True, encoding='utf-8')))
-        return etree.tostring(root, xml_declaration=True, encoding='utf-8')
+            raise e
 
     def post_grade(self, grade):
-        message_identifier_id = 'message_identifier_id'
+        message_identifier_id = self.message_identifier_id()
         operation = 'replaceResult'
         lis_result_sourcedid = self.lis_result_sourcedid()
         # # edX devbox fix
         score = float(grade)
         if score <= 1.0 and score >= 0:
-            xml = self.generate_request_xml(\
+            xml = generate_request_xml(\
                 message_identifier_id, operation, lis_result_sourcedid, \
                 score)
             post_message(self._consumers(), self.key(),\
                          self.response_url(), xml)
             return True
 
-        print "Grade {}".format(grade)
         return False
 
     def close_session(self):
@@ -164,6 +134,35 @@ class LTI(object):
             if session.get(prop, None):
                 del session[prop]
         session[LTI_SESSION_KEY] = False
+
+# def lti_staff_required(func):
+#     """
+#     Decorator to make sure that person is a
+#     member of one of the course staff roles
+#     before allowing them to the view. Requires that
+#     lti_authentication has occurred
+#     """
+#
+#     @wraps(func)
+#     def decorator(*args, **kwargs):
+#         """
+#         Check session['role'] against known list of course staff
+#         roles and raise if it isn't in that set.
+#         """
+#         log.debug(session)
+#         role = session.get('roles', None)
+#         if not role:
+#             raise LTIRoleException(
+#                 'User does not have a role. One is required'
+#             )
+#         if role not in LTI_STAFF_ROLES:
+#             raise LTIRoleException(
+#                 'You are not in a staff level role. Access is restricted '
+#                 'to course staff.'
+#             )
+#         return func(*args, **kwargs)
+#
+#     return decorator
 
 
 def lti(*lti_args, **lti_kwargs):
@@ -187,12 +186,7 @@ def lti(*lti_args, **lti_kwargs):
 
         return wrapper
 
-    if len(lti_args) == 1 and callable(lti_args[0]):
-        # No arguments, this is the decorator
-        # Set default values for the arguments
-        ret = _lti(lti_args[0], lti_args=[], lti_kwargs=dict())
-    else:
-        ret = partial(_lti, *lti_args, lti_args=lti_args, lti_kwargs=lti_kwargs)
+    ret = partial(_lti, *lti_args, lti_args=lti_args, lti_kwargs=lti_kwargs)
 
     return ret
 

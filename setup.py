@@ -99,11 +99,7 @@ except ImportError:
             out = [item for item in out if not fnmatchcase(item, pat)]
         return out
 
-    #extra = {'scripts': ['bin/pylti']}
-
-VERSION = 0.0001
-#static = os.path.join('pylti', 'static.py')
-#execfile(static)  # pull VERSION from static.py
+VERSION = __import__('pylti').VERSION
 
 README = open('README.rst').read()
 

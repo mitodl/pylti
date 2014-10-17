@@ -72,8 +72,8 @@ class LTI(object):
         url = session['lis_outcome_service_url']
         app_config = self.lti_kwargs['app'].config
         urls = app_config.get('PYLTI_URL_FIX', dict())
-        # # url remapping is useful for using devstack
-        # # devstack reports httpS://localhost:8000/ and listens on HTTP
+        # url remapping is useful for using devstack
+        # devstack reports httpS://localhost:8000/ and listens on HTTP
         for prefix, mapping in urls.iteritems():
             if url.startswith(prefix):
                 for _from, _to in mapping.iteritems():

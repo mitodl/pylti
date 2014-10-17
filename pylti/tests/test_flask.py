@@ -178,7 +178,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get(new_url)
@@ -210,7 +209,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get(new_url)
@@ -243,7 +241,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get("{}&FAIL=TRUE".format(new_url))
@@ -282,7 +279,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get("{}&FAIL=TRUE".format(new_url))
@@ -324,7 +320,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get(new_url)
@@ -370,7 +365,6 @@ class TestFlask(unittest.TestCase):
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url, urlparams))
-        print signature[0]
         signed_url = signature[0]
         new_url = signed_url[len('http://localhost'):]
         ret = self.app.get(new_url)

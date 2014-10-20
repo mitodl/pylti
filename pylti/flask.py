@@ -13,8 +13,6 @@ import logging
 
 log = logging.getLogger('pylti.flask') # pylint: disable=invalid-name
 
-# request = 'any' || 'initial' || 'session'
-
 class LTIVerificationFailedException(Exception):
     """
     LTI Verification failed exception

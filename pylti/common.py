@@ -39,10 +39,10 @@ LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
 LTI_SESSION_KEY = 'lti_authenticated'
 
 LTI_REQUEST_TYPE = ['any','initial','session']
+
 """
 Classes to handle oauth portion of LTI
 """
-
 class LTIOAuthDataStore(oauth.OAuthDataStore):
     """
     Largely taken from reference implementation

@@ -4,10 +4,24 @@ from pylti.common import LTI_SESSION_KEY
 
 app = Flask(__name__)
 
-state = dict()
+class ExceptionHandler:
+    exception = None
+    def set(self, exception):
+        self.exception = exception
+
+    def get(self):
+        if self.exception is None:
+            return None
+        else:
+            return self.exception['exception']
+
+    def reset(self):
+        self.exception = None
+
+app_exception = ExceptionHandler()
 
 def error(exception):
-    state['exception'] = exception
+    app_exception.set(exception)
     return "error"
 
 

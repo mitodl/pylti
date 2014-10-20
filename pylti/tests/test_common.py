@@ -2,6 +2,10 @@
 """
 Test pylti/test_common.py module
 """
+import unittest
+
+import httpretty
+
 from pylti.common import (
     LTIOAuthDataStore,
     verify_request_common,
@@ -9,8 +13,6 @@ from pylti.common import (
     post_message,
     generate_request_xml
 )
-import unittest
-import httpretty
 
 
 class TestCommon(unittest.TestCase):

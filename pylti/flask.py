@@ -3,13 +3,15 @@
     PyLTI decorator implementation for flask framework
 """
 from __future__ import absolute_import
-from flask import session, request
 from functools import wraps, partial
+import logging
+
+from flask import session, request
+
 from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, \
     verify_request_common, post_message, \
-    LTIException, LTINotInSessionException, LTIRoleException, generate_request_xml
+    LTIException, LTINotInSessionException, generate_request_xml
 
-import logging
 
 log = logging.getLogger('pylti.flask') # pylint: disable=invalid-name
 

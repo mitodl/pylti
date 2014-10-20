@@ -5,9 +5,11 @@ Common classes and methods for PyLTI module
 
 from __future__ import absolute_import
 import logging
+
 import oauth2
 import oauth.oauth as oauth
 from lxml import etree
+
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 

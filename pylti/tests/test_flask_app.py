@@ -1,6 +1,8 @@
-from flask import Flask, session, request
+from flask import Flask, session
+
 from pylti.flask import lti
 from pylti.common import LTI_SESSION_KEY
+
 
 app = Flask(__name__)
 

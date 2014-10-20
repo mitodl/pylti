@@ -4,11 +4,11 @@ Test pylti/test_flask.py module
 """
 from __future__ import absolute_import
 import unittest
-from pylti.common import LTIException, LTI_SESSION_KEY, LTIOAuthDataStore
-from pylti.flask import lti
-from flask import Flask, session, request
-from pylti.tests.test_flask_app import app_exception, app
+
 import httpretty
+
+from pylti.common import LTIException, LTIOAuthDataStore
+from pylti.tests.test_flask_app import app_exception, app
 
 
 class TestFlask(unittest.TestCase):

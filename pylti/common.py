@@ -40,11 +40,13 @@ LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
 
 LTI_SESSION_KEY = 'lti_authenticated'
 
-LTI_REQUEST_TYPE = ['any','initial','session']
+LTI_REQUEST_TYPE = ['any', 'initial', 'session']
 
 """
 Classes to handle oauth portion of LTI
 """
+
+
 class LTIOAuthDataStore(oauth.OAuthDataStore):
     """
     Largely taken from reference implementation
@@ -87,6 +89,7 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
         """
         return None
 
+
 class LTIException(Exception):
     """
     Custom LTI exception for proper handling
@@ -120,7 +123,6 @@ def _post_patched_request(body, client, url):
     :param url: outcome url
     :return: response
     """
-    monkey_patch_function = None
     import httplib2
 
     http = httplib2.Http
@@ -130,7 +132,7 @@ def _post_patched_request(body, client, url):
     def my_normalize(self, headers):
         """ This function patches Authorization header """
         ret = normalize(self, headers)
-        if ret.has_key('authorization'):
+        if 'authorization' in ret:
             ret['Authorization'] = ret.pop('authorization')
         log.debug("headers")
         log.debug(headers)
@@ -181,7 +183,6 @@ def post_message(consumers, lti_key, url, body):
     return True
 
 
-
 def verify_request_common(consumers, url, method, headers, params):
     """
     Verifies that request is valid
@@ -224,14 +225,15 @@ def verify_request_common(consumers, url, method, headers, params):
         #pylint: disable=protected-access
         consumer = oauth_server._get_consumer(oauth_request)
         oauth_server._check_signature(oauth_request, consumer, None)
-    except oauth.OAuthError as err:
+    except oauth.OAuthError:
         # Rethrow our own for nice error handling (don't print
         # error message as it will contain the key
         raise LTIException("OAuth error: Please check your key and secret")
 
     return True
 
-def generate_request_xml(message_identifier_id, operation, \
+
+def generate_request_xml(message_identifier_id, operation,
                          lis_result_sourcedid, score):
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.
@@ -241,8 +243,8 @@ def generate_request_xml(message_identifier_id, operation, \
     :param score:
     :return: XML string
     """
-    root = etree.Element('imsx_POXEnvelopeRequest', xmlns= \
-        'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
+    root = etree.Element('imsx_POXEnvelopeRequest',
+                         xmlns='http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
 
     header = etree.SubElement(root, 'imsx_POXHeader')
     header_info = etree.SubElement(header, 'imsx_POXRequestHeaderInfo')
@@ -266,7 +268,7 @@ def generate_request_xml(message_identifier_id, operation, \
         language.text = 'en'
         text_string = etree.SubElement(result_score, 'textString')
         text_string.text = score.__str__()
-    log.debug("XML Response: \n{}".format(\
+    log.debug("XML Response: \n{}".format(
         etree.tostring(root, xml_declaration=True, encoding='utf-8')))
     return etree.tostring(root, xml_declaration=True, encoding='utf-8')
 

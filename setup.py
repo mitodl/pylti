@@ -21,10 +21,12 @@ try:
         user_options += [
             ('coverage', 'C', 'Produce a coverage report for PyLTI'),
         ]
+        coverage = None
+        test_suite = False
+        test_args = []
 
         def initialize_options(self):
             TestCommand.initialize_options(self)
-            self.coverage = None
 
         def finalize_options(self):
             TestCommand.finalize_options(self)

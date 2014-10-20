@@ -6,8 +6,10 @@ from pylti.common import LTI_SESSION_KEY
 
 app = Flask(__name__)
 
-class ExceptionHandler:
+
+class ExceptionHandler(object):
     exception = None
+
     def set(self, exception):
         self.exception = exception
 
@@ -22,6 +24,7 @@ class ExceptionHandler:
 
 app_exception = ExceptionHandler()
 
+
 def error(exception):
     app_exception.set(exception)
     return "error"
@@ -29,8 +32,8 @@ def error(exception):
 
 @app.route("/unknown_protection")
 @lti(error=error, app=app)
-def unknown_protection(self):
-    return "hi" #pragma: no cover
+def unknown_protection(lti):
+    return "hi"  # pragma: no cover
 
 
 @app.route("/any")

@@ -6,6 +6,8 @@ from __future__ import absolute_import
 import unittest
 
 import httpretty
+import urllib
+import oauthlib.oauth1
 
 from pylti.common import LTIException, LTIOAuthDataStore
 from pylti.tests.test_flask_app import app_exception, app
@@ -15,7 +17,6 @@ class TestFlask(unittest.TestCase):
     consumers = {
         "__consumer_key__": {"secret": "__lti_secret__"}
     }
-
 
     def setUp(self):
         app.config['TESTING'] = True
@@ -70,7 +71,6 @@ class TestFlask(unittest.TestCase):
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(), 'This page requires a valid oauth session or request')
 
-
     def test_access_to_oauth_resource_in_session(self):
         ret = self.app.get('/setup_session')
         ret = self.app.get('/session')
@@ -91,9 +91,7 @@ class TestFlask(unittest.TestCase):
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
-    def generate_launch_request(self, consumers, url, lit_outcome_service_url = None):
-        method = 'GET'
-        headers = dict()
+    def generate_launch_request(self, consumers, url, lit_outcome_service_url=None):
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8',
                   'user_id': u'008437924c9852377e8994829aaac7a1',
                   'roles': u'Instructor',
@@ -103,12 +101,10 @@ class TestFlask(unittest.TestCase):
                   'launch_presentation_return_url': u'',
                   'lis_outcome_service_url': lit_outcome_service_url or u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler',
                   'lti_message_type': u'basic-lti-launch-request',
-        }
+                  }
         store = LTIOAuthDataStore(consumers)
-        import urllib
 
         urlparams = urllib.urlencode(params)
-        import oauthlib.oauth1
 
         client = oauthlib.oauth1.Client('__consumer_key__', client_secret='__lti_secret__',
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
@@ -124,7 +120,6 @@ class TestFlask(unittest.TestCase):
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
-
     def test_access_to_oauth_resource_invalid(self):
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
@@ -132,7 +127,6 @@ class TestFlask(unittest.TestCase):
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(), 'OAuth error: Please check your key and secret')
-
 
     def test_access_to_oauth_resource_invalid_after_session_setup(self):
         self.app.get('/setup_session')
@@ -151,7 +145,7 @@ class TestFlask(unittest.TestCase):
         uri = 'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler'
 
         def request_callback(request, uri, headers):
-            return (200, headers, "success")
+            return 200, headers, "success"
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
 
@@ -172,7 +166,7 @@ class TestFlask(unittest.TestCase):
         uri = 'https://localhost:8000/dev_stack'
 
         def request_callback(request, uri, headers):
-            return (200, headers, "success")
+            return 200, headers, "success"
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
 

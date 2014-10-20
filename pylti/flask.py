@@ -13,13 +13,15 @@ from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, \
     LTIException, LTINotInSessionException, generate_request_xml
 
 
-log = logging.getLogger('pylti.flask') # pylint: disable=invalid-name
+log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
+
 
 class LTIVerificationFailedException(Exception):
     """
     LTI Verification failed exception
     """
     pass
+
 
 class LTI(object):
     def __init__(self, lti_args, lti_kwargs):
@@ -65,7 +67,6 @@ class LTI(object):
     def lis_result_sourcedid(self):
         return session['lis_result_sourcedid']
 
-
     def response_url(self):
         url = session['lis_outcome_service_url']
         app_config = self.lti_kwargs['app'].config
@@ -87,15 +88,15 @@ class LTI(object):
 
         log.debug('verify_request?')
         try:
-            verify_request_common(self._consumers(), request.url, \
-                                 request.method, request.headers, params)
+            verify_request_common(self._consumers(), request.url,
+                                  request.method, request.headers, params)
             log.debug('verify_request success')
 
             # All good to go, store all of the LTI params into a
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
-                    log.debug("params {}={}".format(prop, \
+                    log.debug("params {}={}".format(prop,
                                                     params.get(prop, None)))
                     session[prop] = params[prop]
 
@@ -118,10 +119,10 @@ class LTI(object):
         # # edX devbox fix
         score = float(grade)
         if 0 <= score <= 1.0:
-            xml = generate_request_xml(\
-                message_identifier_id, operation, lis_result_sourcedid, \
+            xml = generate_request_xml(
+                message_identifier_id, operation, lis_result_sourcedid,
                 score)
-            post_message(self._consumers(), self.key(),\
+            post_message(self._consumers(), self.key(),
                          self.response_url(), xml)
             return True
 
@@ -133,7 +134,8 @@ class LTI(object):
                 del session[prop]
         session[LTI_SESSION_KEY] = False
 
-def lti(*lti_args, **lti_kwargs):
+
+def lti(*lti_args_out, **lti_kwargs_out):
     def _lti(function, lti_args=None, lti_kwargs=None):
         @wraps(function)
         def wrapper(*args, **kwargs):
@@ -141,20 +143,18 @@ def lti(*lti_args, **lti_kwargs):
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
                 kwargs['lti'] = the_lti
-                ret = function(*args, **kwargs)
-                return ret
+                return function(*args, **kwargs)
             except LTIException as lti_exception:
                 error = lti_kwargs.get('error')
                 exception = dict()
                 exception['exception'] = lti_exception
                 exception['kwargs'] = kwargs
                 exception['args'] = args
-                ret = error(exception=exception)
-                return ret
+                return error(exception=exception)
 
         return wrapper
 
-    ret = partial(_lti, *lti_args, lti_args=lti_args, lti_kwargs=lti_kwargs)
+    ret = partial(_lti, *lti_args_out, lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
 
     return ret
 

@@ -14,15 +14,17 @@ from pylti.common import (
     generate_request_xml
 )
 
+import urllib
+import oauthlib.oauth1
+
 
 class TestCommon(unittest.TestCase):
-
-    def test_LTIOAuthDataStore(self):
+    def test_ltioauthdatastore(self):
         consumers = {
             "key1": {"secret": "secret1"},
             "key2": {"secret": "secret2"},
             "key3": {"secret": "secret3"},
-            "keyNS": {"test": "mytest"}
+            "keyNS": {"test": "test"}
         }
         store = LTIOAuthDataStore(consumers)
         self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
@@ -31,12 +33,11 @@ class TestCommon(unittest.TestCase):
         self.assertIsNone(store.lookup_consumer("key4"))
         self.assertIsNone(store.lookup_consumer("keyNS"))
 
-    def test_LTIOAuthDataStore_NoConsumers(self):
+    def test_ltioauthdatastore_no_consumers(self):
         store = LTIOAuthDataStore(None)
         self.assertIsNone(store.lookup_consumer("key1"))
 
-
-    def generate_oauth_request(self,url_to_sign=None):
+    def generate_oauth_request(self, url_to_sign=None):
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
@@ -51,12 +52,10 @@ class TestCommon(unittest.TestCase):
                   'launch_presentation_return_url': u'',
                   'lis_outcome_service_url': u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler',
                   'lti_message_type': u'basic-lti-launch-request',
-        }
+                  }
         store = LTIOAuthDataStore(consumers)
-        import urllib
 
         urlparams = urllib.urlencode(params)
-        import oauthlib.oauth1
 
         client = oauthlib.oauth1.Client('__consumer_key__', client_secret='__lti_secret__',
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
@@ -110,13 +109,12 @@ class TestCommon(unittest.TestCase):
             self.assertTrue(True)
         self.assertFalse(ret)
 
-
     @httpretty.activate
     def test_post_response(self):
         uri = 'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler'
 
         def request_callback(request, uri, headers):
-            return (200, headers, "success")
+            return 200, headers, "success"
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
         consumers = {
@@ -128,7 +126,7 @@ class TestCommon(unittest.TestCase):
     def test_generate_xml(self):
         xml = generate_request_xml('message_identifier_id', 'operation', 'lis_result_sourcedid', 'score')
         self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
-<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID><result><resultScore><language>en</language><textString>score</textString></resultScore></result></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""");
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID><result><resultScore><language>en</language><textString>score</textString></resultScore></result></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""")
         xml = generate_request_xml('message_identifier_id', 'operation', 'lis_result_sourcedid', None)
         self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
 <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""")

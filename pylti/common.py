@@ -77,6 +77,11 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
         return oauth.OAuthConsumer(key, secret)
 
     def lookup_nonce(self, oauth_consumer, oauth_token, nonce):
+        """
+        Lookup nonce should check if nonce was already used by this consumer in the past.
+        Reusing nonce is bad: http://cwe.mitre.org/data/definitions/323.html
+        Not implemented.
+        """
         return None
 
 class LTIException(Exception):
@@ -176,6 +181,7 @@ def post_message(consumers, lti_key, url, body):
 
 def verify_request_common(consumers, url, method, headers, params):
     """
+    Verifies that request is valid
     :param consumers: consumers from config file
     :param url: request url
     :param method: request method
@@ -224,6 +230,14 @@ def verify_request_common(consumers, url, method, headers, params):
 
 def generate_request_xml(message_identifier_id, operation, \
                          lis_result_sourcedid, score):
+    """
+    Generates LTI 1.1 XML for posting result to LTI consumer.
+    :param message_identifier_id:
+    :param operation:
+    :param lis_result_sourcedid:
+    :param score:
+    :return: XML string
+    """
     root = etree.Element('imsx_POXEnvelopeRequest', xmlns= \
         'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
 

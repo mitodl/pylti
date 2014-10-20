@@ -10,11 +10,11 @@ from pylti.common import (
     generate_request_xml
 )
 import unittest
-from oauth import oauth
 import httpretty
 
 
 class TestCommon(unittest.TestCase):
+
     def test_LTIOAuthDataStore(self):
         consumers = {
             "key1": {"secret": "secret1"},
@@ -34,13 +34,12 @@ class TestCommon(unittest.TestCase):
         self.assertIsNone(store.lookup_consumer("key1"))
 
 
-    def test_verify_request_common(self):
+    def generate_oauth_request(self,url_to_sign=None):
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
         url = 'http://localhost:5000/?'
         method = 'GET'
-        headers = dict()
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8',
                   'user_id': u'008437924c9852377e8994829aaac7a1',
                   'roles': u'Instructor',
@@ -60,7 +59,7 @@ class TestCommon(unittest.TestCase):
         client = oauthlib.oauth1.Client('__consumer_key__', client_secret='__lti_secret__',
                                         signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(url, urlparams))
+        signature = client.sign("{}{}".format(url_to_sign or url, urlparams))
         import urlparse
 
         q = urlparse.urlparse(signature[0])
@@ -68,69 +67,25 @@ class TestCommon(unittest.TestCase):
         verify_params = dict()
         for k, v in qs.iteritems():
             verify_params[k] = v[0]
+        return consumers, method, url, verify_params, params
+
+    def test_verify_request_common(self):
+        headers = dict()
+        consumers, method, url, verify_params, params = self.generate_oauth_request()
         ret = verify_request_common(consumers, url, method, headers, verify_params)
         self.assertTrue(ret)
 
     def test_verify_request_common_via_proxy(self):
-        consumers = {
-            "__consumer_key__": {"secret": "__lti_secret__"}
-        }
-        url = 'http://localhost:5000/?'
-        orig_url = 'https://localhost:5000/?'
-        method = 'GET'
         headers = dict()
         headers['X-Forwarded-Proto'] = 'https'
-        params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8',
-                  'user_id': u'008437924c9852377e8994829aaac7a1',
-                  'roles': u'Instructor',
-                  'lis_result_sourcedid': u'MITx/ODL_ENG/2014_T1:edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8:008437924c9852377e8994829aaac7a1',
-                  'context_id': u'MITx/ODL_ENG/2014_T1',
-                  'lti_version': u'LTI-1p0',
-                  'launch_presentation_return_url': u'',
-                  'lis_outcome_service_url': u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler',
-                  'lti_message_type': u'basic-lti-launch-request',
-        }
-
-        store = LTIOAuthDataStore(consumers)
-        import urllib
-
-        urlparams = urllib.urlencode(params)
-        import oauthlib.oauth1
-
-        client = oauthlib.oauth1.Client('__consumer_key__', client_secret='__lti_secret__',
-                                        signature_method=oauthlib.oauth1.SIGNATURE_HMAC,
-                                        signature_type=oauthlib.oauth1.SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(orig_url, urlparams))
-        import urlparse
-
-        q = urlparse.urlparse(signature[0])
-        qs = urlparse.parse_qs(q.query, keep_blank_values=True)
-        verify_params = dict()
-        for k, v in qs.iteritems():
-            verify_params[k] = v[0]
+        orig_url = 'https://localhost:5000/?'
+        consumers, method, url, verify_params, params = self.generate_oauth_request(url_to_sign=orig_url)
         ret = verify_request_common(consumers, url, method, headers, verify_params)
         self.assertTrue(ret)
 
     def test_verify_request_common_no_auth_fields(self):
-        consumers = {
-            "__consumer_key__": {"secret": "__lti_secret__"}
-        }
-        url = 'http://localhost:5000/?'
-        orig_url = 'https://localhost:5000/?'
-        method = 'GET'
         headers = dict()
-        headers['X-Forwarded-Proto'] = 'https'
-        params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8',
-                  'user_id': u'008437924c9852377e8994829aaac7a1',
-                  'roles': u'Instructor',
-                  'lis_result_sourcedid': u'MITx/ODL_ENG/2014_T1:edge.edx.org-i4x-MITx-ODL_ENG-lti-94173d3e79d145fd8ec2e83f15836ac8:008437924c9852377e8994829aaac7a1',
-                  'context_id': u'MITx/ODL_ENG/2014_T1',
-                  'lti_version': u'LTI-1p0',
-                  'launch_presentation_return_url': u'',
-                  'lis_outcome_service_url': u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/i4x:;_;_MITx;_ODL_ENG;_lti;_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth/grade_handler',
-                  'lti_message_type': u'basic-lti-launch-request',
-        }
-
+        consumers, method, url, verify_params, params = self.generate_oauth_request()
         ret = False
         try:
             ret = verify_request_common(consumers, url, method, headers, params)
@@ -143,10 +98,8 @@ class TestCommon(unittest.TestCase):
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
         url = 'http://localhost:5000/?'
-        orig_url = 'https://localhost:5000/?'
         method = 'GET'
         headers = dict()
-        headers['X-Forwarded-Proto'] = 'https'
         params = dict()
         ret = False
         try:
@@ -177,6 +130,3 @@ class TestCommon(unittest.TestCase):
         xml = generate_request_xml('message_identifier_id', 'operation', 'lis_result_sourcedid', None)
         self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
 <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version><imsx_messageIdentifier>message_identifier_id</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader><imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest></imsx_POXBody></imsx_POXEnvelopeRequest>""")
-
-        # if __name__ == '__main__':
-        # unittest.main()

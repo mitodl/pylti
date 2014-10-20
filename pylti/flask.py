@@ -52,8 +52,6 @@ class LTI(object):
         app_config = self.lti_kwargs['app'].config
         config = app_config.get('PYLTI_CONFIG', dict())
         consumers = config.get('consumers', dict())
-        print "CONFIG " , config
-        print "consumers " , consumers
         return consumers
 
     def key(self):

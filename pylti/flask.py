@@ -28,22 +28,22 @@ class LTI(object):
     def verify(self):
         log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
         if self.lti_kwargs.get('request') == 'session':
-            self.verify_session()
+            self._verify_session()
         elif self.lti_kwargs.get('request') == 'initial':
             self.verify_request()
         elif self.lti_kwargs.get('request') == 'any':
-            self.verify_any()
+            self._verify_any()
         else:
             raise LTIException("Unknown request type")
 
-    def verify_any(self):
+    def _verify_any(self):
         log.debug('verify_any enter')
         try:
-            self.verify_session()
+            self._verify_session()
         except LTINotInSessionException:
             self.verify_request()
 
-    def verify_session(self):
+    def _verify_session(self):
         if not session.get(LTI_SESSION_KEY, False):
             log.debug('verify_session failed')
             raise LTINotInSessionException('Session expired or unavailable')
@@ -115,7 +115,7 @@ class LTI(object):
         lis_result_sourcedid = self.lis_result_sourcedid()
         # # edX devbox fix
         score = float(grade)
-        if score <= 1.0 and score >= 0:
+        if 0 <= score <= 1.0:
             xml = generate_request_xml(\
                 message_identifier_id, operation, lis_result_sourcedid, \
                 score)
@@ -130,36 +130,6 @@ class LTI(object):
             if session.get(prop, None):
                 del session[prop]
         session[LTI_SESSION_KEY] = False
-
-# def lti_staff_required(func):
-#     """
-#     Decorator to make sure that person is a
-#     member of one of the course staff roles
-#     before allowing them to the view. Requires that
-#     lti_authentication has occurred
-#     """
-#
-#     @wraps(func)
-#     def decorator(*args, **kwargs):
-#         """
-#         Check session['role'] against known list of course staff
-#         roles and raise if it isn't in that set.
-#         """
-#         log.debug(session)
-#         role = session.get('roles', None)
-#         if not role:
-#             raise LTIRoleException(
-#                 'User does not have a role. One is required'
-#             )
-#         if role not in LTI_STAFF_ROLES:
-#             raise LTIRoleException(
-#                 'You are not in a staff level role. Access is restricted '
-#                 'to course staff.'
-#             )
-#         return func(*args, **kwargs)
-#
-#     return decorator
-
 
 def lti(*lti_args, **lti_kwargs):
     def _lti(function, lti_args=None, lti_kwargs=None):

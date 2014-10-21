@@ -62,8 +62,8 @@ try:
                                 "pytest-flakes==0.2", "pytest==2.6.3",
                                 "httpretty==0.8.3", "flask==0.10.1"],
                  cmdclass={"test": PyTest},
-                 install_requires=["oauth2==1.5.211", "oauth==1.0.1",
-                                   "lxml==3.4.0", "oauthlib==0.6.3"],
+                 install_requires=["oauth==1.0.1","lxml==3.4.0",
+                                   "oauthlib==0.6.3", "requests==2.4.3"],
                  include_package_data=True,
                  zip_safe=False)
 except ImportError:

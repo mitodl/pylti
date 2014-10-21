@@ -145,7 +145,7 @@ class TestCommon(unittest.TestCase):
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
-        body = 'THIS_IS_RESPONSE'
+        body = '<xml></xml>'
         post_message(consumers, "__consumer_key__", uri, body)
 
     def test_generate_xml(self):

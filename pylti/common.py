@@ -6,7 +6,6 @@ Common classes and methods for PyLTI module
 from __future__ import absolute_import
 import logging
 
-import oauth2
 import oauth.oauth as oauth
 import oauthlib.oauth1
 from lxml import etree
@@ -115,6 +114,7 @@ class LTIRoleException(LTIException):
     """
     pass
 
+
 def post_message(consumers, lti_key, url, body):
     """
         Posts a signed message to LTI consumer
@@ -130,18 +130,18 @@ def post_message(consumers, lti_key, url, body):
     lti_consumer = oauth_store.lookup_consumer(lti_key)
     secret = lti_consumer.secret
 
-    consumer = oauth2.Consumer(key=lti_key, secret=secret)
-    client = oauth2.Client(consumer)
     client = oauthlib.oauth1.Client(lti_key,
-                                        client_secret=secret,
-                                        signature_method=oauthlib.oauth1.
-                                        SIGNATURE_HMAC,
-                                        signature_type=oauthlib.oauth1.
-                                        SIGNATURE_TYPE_QUERY)
+                                    client_secret=secret,
+                                    signature_method=oauthlib.oauth1.
+                                    SIGNATURE_HMAC,
+                                    signature_type=oauthlib.oauth1.
+                                    SIGNATURE_TYPE_QUERY)
 
-    (url, headers, oauthbody) = client.sign(url, 'POST', unicode(body), headers={ 'Content-Type': 'application/xml'})
+    (url, headers, oauthbody) = client.sign(url, 'POST', body,
+                                            headers={'Content-Type':
+                                                     'application/xml'})
 
-    response = requests.post(url=url,data=oauthbody,headers=headers)
+    response = requests.post(url=url, data=oauthbody, headers=headers)
     # TODO: inspect content and return True if success
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))

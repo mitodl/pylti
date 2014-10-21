@@ -14,11 +14,17 @@ from pylti.common import (
     generate_request_xml
 )
 
+from pylti import VERSION
+
 import urllib
 import oauthlib.oauth1
 
 
 class TestCommon(unittest.TestCase):
+
+    def test_hasversion(self):
+        self.assertRegexpMatches(VERSION, "[0-9]+\.[0-9]+\.[0-9]+")
+
     def test_ltioauthdatastore(self):
         consumers = {
             "key1": {"secret": "secret1"},

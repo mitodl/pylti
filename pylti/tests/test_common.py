@@ -22,7 +22,7 @@ import oauthlib.oauth1
 class TestCommon(unittest.TestCase):
 
     def test_hasversion(self):
-        self.assertRegexpMatches(pylti.VERSION, "[0-9]+\.[0-9]+\.[0-9]+")
+        self.assertRegexpMatches(pylti.VERSION, "[0-9]+\\.[0-9]+\\.[0-9]+")
 
     def test_ltioauthdatastore(self):
         consumers = {

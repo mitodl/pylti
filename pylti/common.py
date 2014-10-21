@@ -142,14 +142,12 @@ def post_message(consumers, lti_key, url, body):
                                                      'application/xml'})
 
     response = requests.post(url=url, data=oauthbody, headers=headers)
-    # TODO: inspect content and return True if success
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
     log.debug(body)
     log.debug(response.text)
     log.debug(response.ok)
-    # log.debug(content)
     return response.ok
 
 

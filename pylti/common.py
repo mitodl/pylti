@@ -83,7 +83,8 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
 
     def lookup_nonce(self, oauth_consumer, oauth_token, nonce):
         """
-        Lookup nonce should check if nonce was already used by this consumer in the past.
+        Lookup nonce should check if nonce was already used
+        by this consumer in the past.
         Reusing nonce is bad: http://cwe.mitre.org/data/definitions/323.html
         Not implemented.
         """
@@ -149,7 +150,7 @@ def _post_patched_request(body, client, url):
         headers={'Content-Type': 'application/xml'})
 
     http = httplib2.Http
-    #pylint: disable=protected-access
+    # pylint: disable=protected-access
     http._normalize_headers = monkey_patch_function
 
     return response
@@ -173,7 +174,7 @@ def post_message(consumers, lti_key, url, body):
     client = oauth2.Client(consumer)
     # monkey_patch_headers ensures that Authorization header is NOT lower cased
     response = _post_patched_request(body, client, url)
-    #TODO: inspect content and return True if success
+    # TODO: inspect content and return True if success
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
@@ -222,7 +223,7 @@ def verify_request_common(consumers, url, method, headers, params):
         raise LTIException('This page requires a valid oauth session '
                            'or request')
     try:
-        #pylint: disable=protected-access
+        # pylint: disable=protected-access
         consumer = oauth_server._get_consumer(oauth_request)
         oauth_server._check_signature(oauth_request, consumer, None)
     except oauth.OAuthError:
@@ -243,8 +244,9 @@ def generate_request_xml(message_identifier_id, operation,
     :param score:
     :return: XML string
     """
-    root = etree.Element('imsx_POXEnvelopeRequest',
-                         xmlns='http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0')
+    root = etree.Element(u'imsx_POXEnvelopeRequest',
+                         xmlns=u'http://www.imsglobal.org/services/'
+                               u'ltiv1p1/xsd/imsoms_v1p0')
 
     header = etree.SubElement(root, 'imsx_POXHeader')
     header_info = etree.SubElement(header, 'imsx_POXRequestHeaderInfo')
@@ -261,7 +263,7 @@ def generate_request_xml(message_identifier_id, operation,
 
     sourcedid = etree.SubElement(guid, 'sourcedId')
     sourcedid.text = lis_result_sourcedid
-    if not score is None:
+    if score is not None:
         result = etree.SubElement(record, 'result')
         result_score = etree.SubElement(result, 'resultScore')
         language = etree.SubElement(result_score, 'language')
@@ -271,4 +273,3 @@ def generate_request_xml(message_identifier_id, operation,
     log.debug("XML Response: \n{}".format(
         etree.tostring(root, xml_declaration=True, encoding='utf-8')))
     return etree.tostring(root, xml_declaration=True, encoding='utf-8')
-

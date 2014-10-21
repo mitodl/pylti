@@ -73,4 +73,3 @@ def logout_route(lti):
 def post_grade(grade, lti):
     ret = lti.post_grade(grade)
     return "grade={}".format(ret)
-

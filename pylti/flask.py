@@ -154,8 +154,7 @@ def lti(*lti_args_out, **lti_kwargs_out):
 
         return wrapper
 
-    ret = partial(_lti, *lti_args_out, lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
+    ret = partial(_lti, *lti_args_out,
+                  lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
 
     return ret
-
-

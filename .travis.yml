@@ -5,4 +5,4 @@ python:
 install:
     - python setup.py install --quiet
 script:
-    - python setup.py test --coverage
+    - python setup.py test --coverage --pep8 --flakes

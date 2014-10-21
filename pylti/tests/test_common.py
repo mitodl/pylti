@@ -77,10 +77,13 @@ class TestCommon(unittest.TestCase):
                                         signature_type=oauthlib.oauth1.
                                         SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url_to_sign or url, urlparams))
-        import urlparse
 
-        q = urlparse.urlparse(signature[0])
-        qs = urlparse.parse_qs(q.query, keep_blank_values=True)
+        try:
+            from urllib.parse import urlparse, parse_qs
+        except ImportError:
+            from urlparse import urlparse, parse_qs
+        q = urlparse(signature[0])
+        qs = parse_qs(q.query, keep_blank_values=True)
         verify_params = dict()
         for k, v in qs.iteritems():
             verify_params[k] = v[0]

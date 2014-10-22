@@ -48,6 +48,7 @@ LTI_SESSION_KEY = u'lti_authenticated'
 
 LTI_REQUEST_TYPE = [u'any', u'initial', u'session']
 
+
 class LTIOAuthDataStore(oauth.OAuthDataStore):
     """
     Largely taken from reference implementation

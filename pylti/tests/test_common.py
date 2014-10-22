@@ -15,6 +15,11 @@ from pylti.common import (
     generate_request_xml
 )
 
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
+
 import urllib
 import oauthlib.oauth1
 
@@ -77,10 +82,6 @@ class TestCommon(unittest.TestCase):
                                         SIGNATURE_TYPE_QUERY)
         signature = client.sign("{}{}".format(url_to_sign or url, urlparams))
 
-        try:
-            from urllib.parse import urlparse, parse_qs
-        except ImportError:
-            from urlparse import urlparse, parse_qs
         q = urlparse(signature[0])
         qs = parse_qs(q.query, keep_blank_values=True)
         verify_params = dict()

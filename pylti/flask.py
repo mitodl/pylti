@@ -103,14 +103,14 @@ class LTI(object):
             # Set logged in session key
             session[LTI_SESSION_KEY] = True
             return True
-        except LTIException as e:
+        except LTIException:
             log.debug('verify_request failed')
             for prop in LTI_PROPERTY_LIST:
                 if session.get(prop, None):
                     del session[prop]
 
             session[LTI_SESSION_KEY] = False
-            raise e
+            raise
 
     def post_grade(self, grade):
         message_identifier_id = self.message_identifier_id()

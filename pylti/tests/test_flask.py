@@ -96,12 +96,37 @@ class TestFlask(unittest.TestCase):
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
+    def test_access_to_oauth_resource_staff_only_as_student(self):
+        consumers = self.consumers
+        url = 'http://localhost/initial_staff?'
+        new_url = self.generate_launch_request(consumers, url,
+                                               roles='Student')
+        self.app.get(new_url)
+        self.assertTrue(self.has_exception())
+
+    def test_access_to_oauth_resource_staff_only_as_administrator(self):
+        consumers = self.consumers
+        url = 'http://localhost/initial_staff?'
+        new_url = self.generate_launch_request(consumers, url,
+                                               roles='Administrator')
+        self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+    def test_access_to_oauth_resource_staff_only_as_unknown_role(self):
+        consumers = self.consumers
+        url = 'http://localhost/initial_unknown?'
+        new_url = self.generate_launch_request(consumers, url,
+                                               roles='Administrator')
+        self.app.get(new_url)
+        self.assertTrue(self.has_exception())
+
     def generate_launch_request(self, consumers, url,
-                                lit_outcome_service_url=None):
+                                lit_outcome_service_url=None,
+                                roles=u'Instructor'):
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-'
                                       u'94173d3e79d145fd8ec2e83f15836ac8',
                   'user_id': u'008437924c9852377e8994829aaac7a1',
-                  'roles': u'Instructor',
+                  'roles': roles,
                   'lis_result_sourcedid': u'MITx/ODL_ENG/2014_T1:'
                                           u'edge.edx.org-i4x-MITx-ODL_ENG-lti-'
                                           u'94173d3e79d145fd8ec2e83f15836ac8:'

@@ -9,8 +9,8 @@ import logging
 from flask import session, request
 
 from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
-                     verify_request_common, post_message,
-                     LTIException, LTINotInSessionException,
+                     LTI_ROLES, verify_request_common, post_message,
+                     LTIException, LTIRoleException, LTINotInSessionException,
                      generate_request_xml)
 
 
@@ -67,6 +67,29 @@ class LTI(object):
 
     def lis_result_sourcedid(self):
         return session['lis_result_sourcedid']
+
+    def role(self):
+        return session['roles']
+
+    def is_role(self, role):
+        log.debug("is_role {}".format(role))
+        roles = session['roles']
+        if role in LTI_ROLES:
+            list = LTI_ROLES[role]
+            log.debug("is_role roles_list={} role={} in list={}"
+                      .format(list, roles, roles in list))
+            return roles in list
+        else:
+            raise LTIException("Unknown role {}.".format(role))
+
+    def check_role(self):
+        role = u'any'
+        if 'role' in self.lti_kwargs:
+            role = self.lti_kwargs['role']
+        log.debug("check_role lti_role={} decorator_role={}"
+                  .format(self.role(), role))
+        if not self.is_role(role):
+            raise LTIRoleException('Not authorized.')
 
     def response_url(self):
         url = session['lis_outcome_service_url']
@@ -143,6 +166,7 @@ def lti(*lti_args_out, **lti_kwargs_out):
             try:
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
+                the_lti.check_role()
                 kwargs['lti'] = the_lti
                 return function(*args, **kwargs)
             except LTIException as lti_exception:

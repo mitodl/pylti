@@ -54,10 +54,23 @@ def initial_route(lti):
     return "hi"
 
 
+@app.route("/initial_staff", methods=['GET', 'POST'])
+@lti(error=error, request='initial', role='staff', app=app)
+def initial_staff_route(lti):
+    return "hi"
+
+
+@app.route("/initial_unknown", methods=['GET', 'POST'])
+@lti(error=error, request='initial', role='unknown', app=app)
+def initial_unknown_route(lti):
+    return "hi"  # pragma: no cover
+
+
 @app.route("/setup_session")
 def setup_session():
     session[LTI_SESSION_KEY] = True
     session['oauth_consumer_key'] = '__consumer_key__'
+    session['roles'] = 'Student'
     return "session set"
 
 

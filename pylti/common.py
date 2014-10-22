@@ -36,11 +36,17 @@ LTI_PROPERTY_LIST = [
     'lis_outcome_service_url'
 ]
 
-LTI_STAFF_ROLES = ['Instructor', 'Administrator', ]
+LTI_ROLES = {
+    u'staff': [u'Administrator', u'Instructor', ],
+    u'instructor': [u'Instructor', ],
+    u'administrator': [u'Administrator', ],
+    u'student': [u'Student', ],
+    u'any': [u'Administrator', u'Instructor', u'Student', ],
+}
 
-LTI_SESSION_KEY = 'lti_authenticated'
+LTI_SESSION_KEY = u'lti_authenticated'
 
-LTI_REQUEST_TYPE = ['any', 'initial', 'session']
+LTI_REQUEST_TYPE = [u'any', u'initial', u'session']
 
 
 class LTIOAuthDataStore(oauth.OAuthDataStore):

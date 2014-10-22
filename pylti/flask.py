@@ -8,9 +8,10 @@ import logging
 
 from flask import session, request
 
-from .common import LTI_SESSION_KEY, LTI_PROPERTY_LIST, \
-    verify_request_common, post_message, \
-    LTIException, LTINotInSessionException, generate_request_xml
+from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
+                     verify_request_common, post_message,
+                     LTIException, LTINotInSessionException,
+                     generate_request_xml)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name

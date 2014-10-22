@@ -1,1 +1,13 @@
-wsgiref==0.1.2
+Flask==0.10.1
+httpretty==0.8.3
+lxml==3.4.0
+oauth==1.0.1
+oauthlib==0.6.3
+pyflakes==0.8.1
+pytest==2.6.3
+pytest-cache==1.0
+pytest-cov==1.8.0
+pytest-flakes==0.2
+pytest-pep8==1.0.6
+requests==2.4.3
+

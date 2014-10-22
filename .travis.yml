@@ -1,9 +1,8 @@
-# http://travis-ci.org/#!/jtriley/StarCluster
+# http://travis-ci.org/#!/mitxlti/pylti
 language: python
 python:
-    - 2.6
     - 2.7
 install:
     - python setup.py install --quiet
 script:
-    - python setup.py test --coverage
+    - python setup.py test --coverage --pep8 --flakes

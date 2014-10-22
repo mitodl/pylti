@@ -45,3 +45,9 @@ coverage.xml
 
 # Translations
 *.mo
+
+#PyCharm
+.idea
+
+#Coverage
+htmlcov/*

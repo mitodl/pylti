@@ -4,9 +4,9 @@ Test pylti/test_flask.py module
 """
 from __future__ import absolute_import
 import unittest
+import urllib
 
 import httpretty
-import urllib
 import oauthlib.oauth1
 
 from pylti.common import LTIException

@@ -6,10 +6,10 @@ Common classes and methods for PyLTI module
 from __future__ import absolute_import
 import logging
 
+import oauth2
 import oauth.oauth as oauth
-import oauthlib.oauth1
 from lxml import etree
-import requests
+
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 
@@ -118,6 +118,47 @@ class LTIRoleException(LTIException):
     pass
 
 
+def _post_patched_request(body, client, url):
+    """
+    Authorization header needs to be capitalized for some LTI clients
+    this function ensures that header is capitalized
+    :param body: body of the call
+    :param client: OAuth Client
+    :param url: outcome url
+    :return: response
+    """
+    import httplib2
+
+    http = httplib2.Http
+    # pylint: disable=protected-access
+    normalize = http._normalize_headers
+
+    def my_normalize(self, headers):
+        """ This function patches Authorization header """
+        ret = normalize(self, headers)
+        if 'authorization' in ret:
+            ret['Authorization'] = ret.pop('authorization')
+        log.debug("headers")
+        log.debug(headers)
+        return ret
+
+    http._normalize_headers = my_normalize
+    monkey_patch_function = normalize
+
+    # pylint: disable=unused-variable
+    response, content = client.request(
+        url,
+        'POST',
+        body=body,
+        headers={'Content-Type': 'application/xml'})
+
+    http = httplib2.Http
+    # pylint: disable=protected-access
+    http._normalize_headers = monkey_patch_function
+
+    return response, content
+
+
 def post_message(consumers, lti_key, url, body):
     """
         Posts a signed message to LTI consumer
@@ -133,25 +174,18 @@ def post_message(consumers, lti_key, url, body):
     lti_consumer = oauth_store.lookup_consumer(lti_key)
     secret = lti_consumer.secret
 
-    client = oauthlib.oauth1.Client(lti_key,
-                                    client_secret=secret,
-                                    signature_method=oauthlib.oauth1.
-                                    SIGNATURE_HMAC,
-                                    signature_type=oauthlib.oauth1.
-                                    SIGNATURE_TYPE_QUERY)
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+    (response, content) = _post_patched_request(body, client, url)
 
-    (url, headers, oauthbody) = client.sign(url, 'POST', body,
-                                            headers={'Content-Type':
-                                                     'application/xml'})
-
-    response = requests.post(url=url, data=oauthbody, headers=headers)
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
-    log.debug(body)
-    log.debug(response.text)
-    log.debug(response.ok)
-    return response.ok
+    log.debug("response {}".format(response))
+    log.debug("content {}".format(content))
+    is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
+    log.debug("is success {}".format(is_success))
+    return is_success
 
 
 def verify_request_common(consumers, url, method, headers, params):

@@ -36,7 +36,7 @@ class LTI(object):
         elif 'lis_person_contact_email_primary' in session:
             return session['lis_person_contact_email_primary']
         elif 'user_id' in session:
-            return session['session']
+            return session['user_id']
         else:
             return ''
 

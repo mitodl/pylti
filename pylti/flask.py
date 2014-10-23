@@ -28,7 +28,17 @@ class LTI(object):
     def __init__(self, lti_args, lti_kwargs):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
-        self.nickname = 'nickname'
+        self.nickname = self.name()
+
+    def name(self):
+        if 'lis_person_sourcedid' in session:
+            return session['lis_person_sourcedid']
+        elif 'lis_person_contact_email_primary' in session:
+            return session['lis_person_contact_email_primary']
+        elif 'user_id' in session:
+            return session['session']
+        else:
+            return ''
 
     def verify(self):
         log.debug('verify request={}'.format(self.lti_kwargs.get('request')))

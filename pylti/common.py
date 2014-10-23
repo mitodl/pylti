@@ -29,6 +29,7 @@ LTI_PROPERTY_LIST = [
     'lis_person_name_family',
     'lis_person_name_given',
     'lis_result_sourcedid',
+    'lis_person_sourcedid',
     'launch_type',
     'lti_message',
     'lti_version',

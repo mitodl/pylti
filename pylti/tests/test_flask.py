@@ -18,6 +18,28 @@ class TestFlask(unittest.TestCase):
         "__consumer_key__": {"secret": "__lti_secret__"}
     }
 
+    expected_response = """<?xml version="1.0" encoding="UTF-8"?>
+<imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1\
+/xsd/imsoms_v1p0">
+    <imsx_POXHeader>
+        <imsx_POXResponseHeaderInfo>
+            <imsx_version>V1.0</imsx_version>
+            <imsx_messageIdentifier>edX_fix</imsx_messageIdentifier>
+            <imsx_statusInfo>
+                <imsx_codeMajor>success</imsx_codeMajor>
+                <imsx_severity>status</imsx_severity>
+                <imsx_description>Score for StarX/StarX_DEMO/201X_StarX:\
+edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
+:18b71d3c46cb4dbe66a7c950d88e78ec is now 0.0</imsx_description>
+                <imsx_messageRefIdentifier>
+                </imsx_messageRefIdentifier>
+            </imsx_statusInfo>
+        </imsx_POXResponseHeaderInfo>
+    </imsx_POXHeader>
+    <imsx_POXBody><replaceResultResponse/></imsx_POXBody>
+</imsx_POXEnvelopeResponse>
+        """
+
     def setUp(self):
         app.config['TESTING'] = True
         app.config['SERVER_NAME'] = 'localhost'
@@ -195,7 +217,7 @@ class TestFlask(unittest.TestCase):
                u'/grade_handler')
 
         def request_callback(request, cburi, headers):
-            return 200, headers, "success"
+            return 200, headers, self.expected_response
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
 
@@ -216,7 +238,7 @@ class TestFlask(unittest.TestCase):
         uri = 'https://localhost:8000/dev_stack'
 
         def request_callback(request, cburi, headers):
-            return 200, headers, "success"
+            return 200, headers, self.expected_response
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
 

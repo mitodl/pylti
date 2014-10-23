@@ -118,6 +118,14 @@ class LTIRoleException(LTIException):
     pass
 
 
+class LTIPostMessageException(LTIException):
+    """
+    Exception class for when LTI user doesn't have the
+    right role.
+    """
+    pass
+
+
 def _post_patched_request(body, client, url):
     """
     Authorization header needs to be capitalized for some LTI clients

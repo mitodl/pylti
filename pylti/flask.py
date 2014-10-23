@@ -11,7 +11,7 @@ from flask import session, request
 from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
                      LTI_ROLES, verify_request_common, post_message,
                      LTIException, LTIRoleException, LTINotInSessionException,
-                     generate_request_xml)
+                     LTIPostMessageException, generate_request_xml)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
@@ -156,8 +156,10 @@ class LTI(object):
             xml = generate_request_xml(
                 message_identifier_id, operation, lis_result_sourcedid,
                 score)
-            post_message(self._consumers(), self.key(),
-                         self.response_url(), xml)
+            ret = post_message(self._consumers(), self.key(),
+                               self.response_url(), xml)
+            if not ret:
+                raise LTIPostMessageException("Post Message Failed")
             return True
 
         return False

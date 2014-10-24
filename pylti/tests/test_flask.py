@@ -155,6 +155,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource(self):
+        """
+        Accessing oauth_resource
+        """
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
@@ -253,7 +256,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_invalid(self):
         """
         Deny access to LTI protected resources
-        on man in the middle attach
+        on man in the middle attack
         """
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)

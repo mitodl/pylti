@@ -25,6 +25,9 @@ import oauthlib.oauth1
 
 
 class TestCommon(unittest.TestCase):
+    """
+    Tests for common.py
+    """
     expected_response = """<?xml version="1.0" encoding="UTF-8"?>
 <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1\
 /xsd/imsoms_v1p0">

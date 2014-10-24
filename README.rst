@@ -1,4 +1,4 @@
-H1 PyLTI - LTI done right
+PyLTI - LTI done right
 =========================
 
 

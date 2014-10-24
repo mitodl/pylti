@@ -11,7 +11,7 @@ from flask import session, request
 from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
                      LTI_ROLES, verify_request_common, post_message,
                      LTIException, LTIRoleException, LTINotInSessionException,
-                     generate_request_xml)
+                     LTIPostMessageException, generate_request_xml)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
@@ -28,7 +28,17 @@ class LTI(object):
     def __init__(self, lti_args, lti_kwargs):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
-        self.nickname = 'nickname'
+        self.nickname = self.name()
+
+    def name(self):
+        if 'lis_person_sourcedid' in session:
+            return session['lis_person_sourcedid']
+        elif 'lis_person_contact_email_primary' in session:
+            return session['lis_person_contact_email_primary']
+        elif 'user_id' in session:
+            return session['user_id']
+        else:
+            return ''
 
     def verify(self):
         log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
@@ -146,8 +156,10 @@ class LTI(object):
             xml = generate_request_xml(
                 message_identifier_id, operation, lis_result_sourcedid,
                 score)
-            post_message(self._consumers(), self.key(),
-                         self.response_url(), xml)
+            ret = post_message(self._consumers(), self.key(),
+                               self.response_url(), xml)
+            if not ret:
+                raise LTIPostMessageException("Post Message Failed")
             return True
 
         return False

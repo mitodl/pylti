@@ -166,7 +166,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_name_passed(self):
         """
-        Accessing oauth_resource
+        Check that name is returned if passed via initial request
         """
         consumers = self.consumers
         url = 'http://localhost/name?'
@@ -179,7 +179,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_email_passed(self):
         """
-        Accessing oauth_resource
+        Check that email is returned if passed via initial request
         """
         consumers = self.consumers
         url = 'http://localhost/name?'
@@ -192,7 +192,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_name_and_email_passed(self):
         """
-        Accessing oauth_resource
+        Check that name is returned if both email and name passed
         """
         consumers = self.consumers
         url = 'http://localhost/name?'

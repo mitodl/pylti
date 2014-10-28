@@ -8,5 +8,6 @@ install:
 script:
     - python setup.py test --coverage --pep8 --flakes
     - coverage run --source=pylti 
-after_success: coveralls
+after_success: 
+    coveralls
 

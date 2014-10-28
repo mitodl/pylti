@@ -164,6 +164,46 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
+    def test_access_to_oauth_resource_name_passed(self):
+        """
+        Accessing oauth_resource
+        """
+        consumers = self.consumers
+        url = 'http://localhost/name?'
+        add_params = {u'lis_person_sourcedid': u'person'}
+        new_url = self.generate_launch_request(consumers, url,
+                                               add_params=add_params)
+        ret = self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+        self.assertEqual(ret.data, u'person')
+
+    def test_access_to_oauth_resource_email_passed(self):
+        """
+        Accessing oauth_resource
+        """
+        consumers = self.consumers
+        url = 'http://localhost/name?'
+        add_params = {u'lis_person_contact_email_primary': u'email@email.com'}
+        new_url = self.generate_launch_request(consumers, url,
+                                               add_params=add_params)
+        ret = self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+        self.assertEqual(ret.data, u'email@email.com')
+
+    def test_access_to_oauth_resource_name_and_email_passed(self):
+        """
+        Accessing oauth_resource
+        """
+        consumers = self.consumers
+        url = 'http://localhost/name?'
+        add_params = {u'lis_person_sourcedid': u'person',
+                      u'lis_person_contact_email_primary': u'email@email.com'}
+        new_url = self.generate_launch_request(consumers, url,
+                                               add_params=add_params)
+        ret = self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+        self.assertEqual(ret.data, u'person')
+
     def test_access_to_oauth_resource_staff_only_as_student(self):
         """
         Deny access if user not in role
@@ -199,7 +239,8 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def generate_launch_request(self, consumers, url,
                                 lit_outcome_service_url=None,
-                                roles=u'Instructor'):
+                                roles=u'Instructor',
+                                add_params=None):
         """
         Generate valid basic-lti-launch-request request with options
         :param consumers: consumer map
@@ -230,6 +271,8 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                                  u'grade_handler'),
                   'lti_message_type': u'basic-lti-launch-request',
                   }
+        if add_params is not None:
+            params.update(add_params)
 
         urlparams = urllib.urlencode(params)
 

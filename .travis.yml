@@ -4,5 +4,8 @@ python:
     - 2.7
 install:
     - python setup.py install --quiet
+    - pip install coveralls
 script:
     - python setup.py test --coverage --pep8 --flakes
+after_success: coveralls
+

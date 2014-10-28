@@ -7,7 +7,7 @@ install:
     - pip install coveralls
 script:
     - python setup.py test --coverage --pep8 --flakes
-    - coverage run --source=pylti 
+    - coverage run --source=pylti setup.py test --coverage --pep8 --flakes
 after_success: 
     coveralls
 

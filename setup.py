@@ -61,7 +61,7 @@ try:
                  tests_require=["pytest-cov>=1.8.0", "pytest-pep8>=1.0.6",
                                 "pytest-flakes>=0.2", "pytest>=2.6.3",
                                 "httpretty>=0.8.3", "flask>=0.10.1",
-                                "oauthlib>=0.6.3", ],
+                                "oauthlib>=0.6.3", "semantic_version>=2.3.1"],
                  cmdclass={"test": PyTest},
                  install_requires=["oauth>=1.0.1", "oauth2>=1.5.211", ],
                  include_package_data=True,

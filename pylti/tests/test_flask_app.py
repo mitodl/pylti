@@ -78,6 +78,18 @@ def initial_route(lti):
     return "hi"
 
 
+@app.route("/name", methods=['GET', 'POST'])
+@lti(error=error, request='initial', app=app)
+def name(lti):
+    """
+    access route with 'initial' request
+
+    :param lti: `lti` object
+    :return: string "hi"
+    """
+    return lti.name()
+
+
 @app.route("/initial_staff", methods=['GET', 'POST'])
 @lti(error=error, request='initial', role='staff', app=app)
 def initial_staff_route(lti):

@@ -3,6 +3,7 @@
 Test pylti/test_common.py module
 """
 import unittest
+import semantic_version
 
 import httpretty
 
@@ -50,11 +51,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 </imsx_POXEnvelopeResponse>
         """
 
-    def test_hasversion(self):
-        """
-        Tests that pylti VERSION is valid. http://semver.org/
-        """
-        self.assertRegexpMatches(pylti.VERSION, "[0-9]+\\.[0-9]+\\.[0-9]+")
+    def test_version(self):
+        # Will raise ValueError if not a semantic version
+        semantic_version.Version(pylti.VERSION)
 
     def test_ltioauthdatastore(self):
         """

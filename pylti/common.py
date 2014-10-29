@@ -8,8 +8,7 @@ import logging
 
 import oauth2
 import oauth.oauth as oauth
-from lxml import etree
-
+from xml.etree import ElementTree as etree
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 
@@ -282,6 +281,8 @@ def generate_request_xml(message_identifier_id, operation,
         language.text = 'en'
         text_string = etree.SubElement(result_score, 'textString')
         text_string.text = score.__str__()
+    ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
+        etree.tostring(root, encoding='utf-8'))
     log.debug("XML Response: \n{}".format(
-        etree.tostring(root, xml_declaration=True, encoding='utf-8')))
-    return etree.tostring(root, xml_declaration=True, encoding='utf-8')
+        ret))
+    return ret

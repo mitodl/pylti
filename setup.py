@@ -64,7 +64,7 @@ try:
                                 "oauthlib>=0.6.3", "semantic_version>=2.3.1"],
                  cmdclass={"test": PyTest},
                  install_requires=["oauth>=1.0.1", "oauth2>=1.5.211",
-                                   "lxml>=3.4.0", ],
+                     "httplib2>=0.9" ],
                  include_package_data=True,
                  zip_safe=False)
 except ImportError:

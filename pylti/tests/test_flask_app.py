@@ -151,3 +151,16 @@ def post_grade(grade, lti):
     """
     ret = lti.post_grade(grade)
     return "grade={}".format(ret)
+
+
+@app.route("/post_grade2/<float:grade>")
+@lti(error=error, request='session', app=app)
+def post_grade2(grade, lti):
+    """
+    access route with 'session' request
+
+    :param lti: `lti` object
+    :return: string "grade={}"
+    """
+    ret = lti.post_grade2(grade)
+    return "grade={}".format(ret)

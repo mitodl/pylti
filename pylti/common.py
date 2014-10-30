@@ -12,7 +12,6 @@ from xml.etree import ElementTree as etree
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 
-
 LTI_PROPERTY_LIST = [
     'oauth_consumer_key',
     'launch_presentation_return_url',
@@ -125,7 +124,7 @@ class LTIPostMessageException(LTIException):
     pass
 
 
-def _post_patched_request(body, client, url):
+def _post_patched_request(body, client, url, method, content_type):
     """
     Authorization header needs to be capitalized for some LTI clients
     this function ensures that header is capitalized
@@ -155,9 +154,9 @@ def _post_patched_request(body, client, url):
     # pylint: disable=unused-variable
     response, content = client.request(
         url,
-        'POST',
+        method,
         body=body,
-        headers={'Content-Type': 'application/xml'})
+        headers={'Content-Type': content_type})
 
     http = httplib2.Http
     # pylint: disable=protected-access
@@ -175,6 +174,8 @@ def post_message(consumers, lti_key, url, body):
     :param body: xml body
     :return: success
     """
+    content_type = 'application/xml'
+    method = 'POST'
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
@@ -183,7 +184,8 @@ def post_message(consumers, lti_key, url, body):
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
-    (response, content) = _post_patched_request(body, client, url)
+    (response, content) = _post_patched_request(body, client, url,
+                                                method, content_type)
 
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
@@ -191,6 +193,38 @@ def post_message(consumers, lti_key, url, body):
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
     is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
+    log.debug("is success {}".format(is_success))
+    return is_success
+
+
+def post_message2(consumers, lti_key, url, body,
+                  method='POST', content_type='application/xml'):
+    """
+        Posts a signed message to LTI consumer
+    :param consumers: consumers from config
+    :param lti_key: key to find appropriate consumer
+    :param url: post url
+    :param body: xml body
+    :return: success
+    """
+    oauth_store = LTIOAuthDataStore(consumers)
+    oauth_server = oauth.OAuthServer(oauth_store)
+    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
+    lti_consumer = oauth_store.lookup_consumer(lti_key)
+    secret = lti_consumer.secret
+
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+    (response, content) = _post_patched_request(body, client, url,
+                                                method, content_type)
+
+    log.debug("POST MESSAGE 2")
+    log.debug("key {}".format(lti_key))
+    log.debug("secret {}".format(secret))
+    log.debug("url {}".format(url))
+    log.debug("response {}".format(response))
+    log.debug("content {}".format(content))
+    is_success = response.status == 200
     log.debug("is success {}".format(is_success))
     return is_success
 

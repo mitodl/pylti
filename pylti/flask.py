@@ -5,13 +5,15 @@
 from __future__ import absolute_import
 from functools import wraps, partial
 import logging
+import json
 
 from flask import session, request
 
 from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
-                     LTI_ROLES, verify_request_common, post_message,
+                     LTI_ROLES, verify_request_common,
+                     post_message, post_message2, generate_request_xml,
                      LTIException, LTIRoleException, LTINotInSessionException,
-                     LTIPostMessageException, generate_request_xml)
+                     LTIPostMessageException)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
@@ -39,6 +41,9 @@ class LTI(object):
             return session['user_id']
         else:
             return ''
+
+    def user_id(self):
+        return session['user_id']
 
     def verify(self):
         log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
@@ -158,6 +163,30 @@ class LTI(object):
                 score)
             ret = post_message(self._consumers(), self.key(),
                                self.response_url(), xml)
+            if not ret:
+                raise LTIPostMessageException("Post Message Failed")
+            return True
+
+        return False
+
+    def post_grade2(self, grade, user=None, comment=''):
+        content_type = 'application/vnd.ims.lis.v2.result+json'
+        if user is None:
+            user = self.user_id()
+        lti2_url = self.response_url().replace(
+            "/grade_handler",
+            "/lti_2_0_result_rest_handler/user/{}".format(user))
+        score = float(grade)
+        if 0 <= score <= 1.0:
+            body = json.dumps({
+                "@context": "http://purl.imsglobal.org/ctx/lis/v2/Result",
+                "@type": "Result",
+                "resultScore": score,
+                "comment": comment
+            })
+            ret = post_message2(self._consumers(), self.key(), lti2_url, body,
+                                method='PUT',
+                                content_type=content_type)
             if not ret:
                 raise LTIPostMessageException("Post Message Failed")
             return True

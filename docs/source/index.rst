@@ -9,9 +9,10 @@ Welcome to PyLTI's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
-
-
+    :maxdepth: 2
+   flask.rst
+   pylti_common.rst
+   pylti_flask.rst
 
 Indices and tables
 ==================
@@ -20,3 +21,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Getting Started
+==================

@@ -7,7 +7,8 @@ from functools import wraps, partial
 import logging
 import json
 
-from flask import session, request
+from flask import session
+from flask import request as flask_request
 
 from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
                      LTI_ROLES, verify_request_common,
@@ -27,12 +28,24 @@ class LTIVerificationFailedException(Exception):
 
 
 class LTI(object):
+    """
+    LTI Object represents abstraction of current LTI session. It provides
+    callback methods and methods that allow developer to inspect
+    LTI basic-launch-request.
+
+    This object is instantiated by @lti wrapper.
+    """
+
     def __init__(self, lti_args, lti_kwargs):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
         self.nickname = self.name()
 
     def name(self):
+        """
+        Name returns user's name or user's email or user_id
+        :return: best guess of name to use to greet user
+        """
         if 'lis_person_sourcedid' in session:
             return session['lis_person_sourcedid']
         elif 'lis_person_contact_email_primary' in session:
@@ -43,9 +56,18 @@ class LTI(object):
             return ''
 
     def user_id(self):
+        """
+        :return: user_id
+        """
         return session['user_id']
 
     def verify(self):
+        """
+        Verify if LTI request is valid, validation
+        depends on @lti wrapper arguments
+
+        :raises: LTIException
+        """
         log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
         if self.lti_kwargs.get('request') == 'session':
             self._verify_session()
@@ -55,8 +77,14 @@ class LTI(object):
             self._verify_any()
         else:
             raise LTIException("Unknown request type")
+        return True
 
     def _verify_any(self):
+        """
+        Verify is request is in session or initial request
+
+        :raises: LTIException
+        """
         log.debug('verify_any enter')
         try:
             self._verify_session()
@@ -64,29 +92,64 @@ class LTI(object):
             self.verify_request()
 
     def _verify_session(self):
+        """
+        Verify is session was already created
+
+        :raises: LTIException
+        """
         if not session.get(LTI_SESSION_KEY, False):
             log.debug('verify_session failed')
             raise LTINotInSessionException('Session expired or unavailable')
 
     def _consumers(self):
+        """
+        Gets consumer's map from app config
+        :return: consumers map
+        """
         app_config = self.lti_kwargs['app'].config
         config = app_config.get('PYLTI_CONFIG', dict())
         consumers = config.get('consumers', dict())
         return consumers
 
     def key(self):
+        """
+        OAuth Consumer Key
+        :return: key
+        """
         return session['oauth_consumer_key']
 
     def message_identifier_id(self):
+        """
+        Message identifier to use to XML callback
+
+        :return: non-empty string
+        """
         return "edX_fix"
 
     def lis_result_sourcedid(self):
+        """
+        lis_result_sourcedid to use to XML callback
+
+        :return: LTI lis_result_sourcedid
+        """
         return session['lis_result_sourcedid']
 
     def role(self):
+        """
+        LTI roles
+
+        :return: roles
+        """
         return session['roles']
 
     def is_role(self, role):
+        """
+        Verify if user is in role
+
+        :param role: role to verify against
+        :return: if user is in role
+        :exception: LTIException if role is unknown
+        """
         log.debug("is_role {}".format(role))
         roles = session['roles']
         if role in LTI_ROLES:
@@ -98,6 +161,11 @@ class LTI(object):
             raise LTIException("Unknown role {}.".format(role))
 
     def check_role(self):
+        """
+        Check is user is in role specified as wrapper attribute
+
+        :exception: LTIException if user is not in roles
+        """
         role = u'any'
         if 'role' in self.lti_kwargs:
             role = self.lti_kwargs['role']
@@ -107,6 +175,12 @@ class LTI(object):
             raise LTIRoleException('Not authorized.')
 
     def response_url(self):
+        """
+        Returns remapped lis_outcome_service_url
+        uses PYLTI_URL_FIX map to support edX dev-stack
+
+        :return: remapped lis_outcome_service_url
+        """
         url = session['lis_outcome_service_url']
         app_config = self.lti_kwargs['app'].config
         urls = app_config.get('PYLTI_URL_FIX', dict())
@@ -119,16 +193,22 @@ class LTI(object):
         return url
 
     def verify_request(self):
-        if request.method == 'POST':
-            params = request.form.to_dict()
+        """
+        Verify LTI request
+
+        :raises: LTIException is request validation failed
+        """
+        if flask_request.method == 'POST':
+            params = flask_request.form.to_dict()
         else:
-            params = request.args.to_dict()
+            params = flask_request.args.to_dict()
         log.debug(params)
 
         log.debug('verify_request?')
         try:
-            verify_request_common(self._consumers(), request.url,
-                                  request.method, request.headers, params)
+            verify_request_common(self._consumers(), flask_request.url,
+                                  flask_request.method, flask_request.headers,
+                                  params)
             log.debug('verify_request success')
 
             # All good to go, store all of the LTI params into a
@@ -152,6 +232,13 @@ class LTI(object):
             raise
 
     def post_grade(self, grade):
+        """
+        Post grade to LTI consumer using XML
+
+        :param grade: 0 <= grade <= 1
+        :return: True is post successful and grade valid
+        :exception: LTIPostMessageException if call failed
+        """
         message_identifier_id = self.message_identifier_id()
         operation = 'replaceResult'
         lis_result_sourcedid = self.lis_result_sourcedid()
@@ -170,6 +257,13 @@ class LTI(object):
         return False
 
     def post_grade2(self, grade, user=None, comment=''):
+        """
+        Post grade to LTI consumer using REST/JSON
+
+        :param grade: 0 <= grade <= 1
+        :return: True is post successful and grade valid
+        :exception: LTIPostMessageException if call failed
+        """
         content_type = 'application/vnd.ims.lis.v2.result+json'
         if user is None:
             user = self.user_id()
@@ -194,14 +288,37 @@ class LTI(object):
         return False
 
     def close_session(self):
+        """
+        Invalidates session
+        """
         for prop in LTI_PROPERTY_LIST:
             if session.get(prop, None):
                 del session[prop]
         session[LTI_SESSION_KEY] = False
 
 
-def lti(*lti_args_out, **lti_kwargs_out):
+def lti(app=None, request=None, error=None, role='any',
+        *lti_args_out, **lti_kwargs_out):
+    """
+    LTI decorator
+
+    :param app - Flask App object (required)
+    :param error - Callback if LTI throws exception (required)
+    :param request - Request type (default: any)
+    :param roles - LTI Role (default: any)
+    :return: wrapper
+    """
+
     def _lti(function, lti_args=None, lti_kwargs=None):
+        """
+        Inner LTI decorator
+
+        :param function:
+        :param lti_args:
+        :param lti_kwargs:
+        :return:
+        """
+
         @wraps(function)
         def wrapper(*args, **kwargs):
             try:
@@ -219,8 +336,11 @@ def lti(*lti_args_out, **lti_kwargs_out):
                 return error(exception=exception)
 
         return wrapper
+    lti_kwargs_out['app'] = app
+    lti_kwargs_out['request'] = request
+    lti_kwargs_out['error'] = error
+    lti_kwargs_out['role'] = role
 
-    ret = partial(_lti, *lti_args_out,
-                  lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
+    ret = partial(_lti, lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
 
     return ret

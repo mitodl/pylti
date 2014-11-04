@@ -202,12 +202,12 @@ def post_message(consumers, lti_key, url, body):
 def post_message2(consumers, lti_key, url, body,
                   method='POST', content_type='application/xml'):
     """
-        Posts a signed message to LTI consumer
+        Posts a signed message to LTI consumer using LTI 2.0 format
 
-    :param consumers: consumers from config
-    :param lti_key: key to find appropriate consumer
-    :param url: post url
-    :param body: xml body
+    :param: consumers: consumers from config
+    :param: lti_key: key to find appropriate consumer
+    :param: url: post url
+    :param: body: xml body
     :return: success
     """
     oauth_store = LTIOAuthDataStore(consumers)

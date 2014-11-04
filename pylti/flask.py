@@ -20,13 +20,6 @@ from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
 
 
-class LTIVerificationFailedException(Exception):
-    """
-    LTI Verification failed exception
-    """
-    pass
-
-
 class LTI(object):
     """
     LTI Object represents abstraction of current LTI session. It provides
@@ -146,7 +139,7 @@ class LTI(object):
         """
         Verify if user is in role
 
-        :param role: role to verify against
+        :param: role: role to verify against
         :return: if user is in role
         :exception: LTIException if role is unknown
         """
@@ -235,7 +228,7 @@ class LTI(object):
         """
         Post grade to LTI consumer using XML
 
-        :param grade: 0 <= grade <= 1
+        :param: grade: 0 <= grade <= 1
         :return: True is post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
@@ -260,7 +253,7 @@ class LTI(object):
         """
         Post grade to LTI consumer using REST/JSON
 
-        :param grade: 0 <= grade <= 1
+        :param: grade: 0 <= grade <= 1
         :return: True is post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
@@ -302,10 +295,10 @@ def lti(app=None, request=None, error=None, role='any',
     """
     LTI decorator
 
-    :param app - Flask App object (required)
-    :param error - Callback if LTI throws exception (required)
-    :param request - Request type (default: any)
-    :param roles - LTI Role (default: any)
+    :param: app - Flask App object (required)
+    :param: error - Callback if LTI throws exception (required)
+    :param: request - Request type (default: any)
+    :param: roles - LTI Role (default: any)
     :return: wrapper
     """
 
@@ -313,9 +306,9 @@ def lti(app=None, request=None, error=None, role='any',
         """
         Inner LTI decorator
 
-        :param function:
-        :param lti_args:
-        :param lti_kwargs:
+        :param: function:
+        :param: lti_args:
+        :param: lti_kwargs:
         :return:
         """
 

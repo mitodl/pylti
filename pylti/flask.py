@@ -50,6 +50,8 @@ class LTI(object):
 
     def user_id(self):
         """
+        Returns user_id as provided by LTI
+
         :return: user_id
         """
         return session['user_id']
@@ -153,7 +155,7 @@ class LTI(object):
         else:
             raise LTIException("Unknown role {}.".format(role))
 
-    def check_role(self):
+    def _check_role(self):
         """
         Check is user is in role specified as wrapper attribute
 
@@ -317,7 +319,7 @@ def lti(app=None, request=None, error=None, role='any',
             try:
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
-                the_lti.check_role()
+                the_lti._check_role()
                 kwargs['lti'] = the_lti
                 return function(*args, **kwargs)
             except LTIException as lti_exception:

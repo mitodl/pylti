@@ -3,7 +3,8 @@ Getting started with PyLTI using Flask
 
 PyLTI provides authorization wrapper for Flask requests.
 
-First make sure to import pylti implementation for your framework. In this case Flask.
+To use pylti you will need to import pylti flask specific implementation. And create
+Flask application.
 
 .. code-block:: python
 
@@ -47,8 +48,8 @@ To allow only initial requests to be accessible one can use *request='initial'* 
         """
         return "Initial request"
 
-Or we may have different need, and maybe session page should be only available for subsequent request.
-To allow only initial requests to be accessible one can use *request='session'* as an argument to the wrapper.
+And than some pages should be available after initial page was visited.
+To allow only subsequent requests to be accessible one can use *request='session'* as an argument to the wrapper.
 
 .. code-block:: python
 
@@ -64,7 +65,7 @@ To allow only initial requests to be accessible one can use *request='session'* 
         return "Session request"
 
 
-Some pages in your application may be applicable only to administrators.
+Often time in LTI Producer some page may be applicable only to administrators.
 To protect those pages you can use *role* attribute.
 
 .. code-block:: python
@@ -80,7 +81,13 @@ To protect those pages you can use *role* attribute.
         """
         return "Staff page"
 
-Argument app is flask application, and argument error is function that gets called if access is denied.
+There are number or arguments to *@lti* that may need to explained. Required arguments
+are *app*, *error* and *request*, and optional arguments is *role*
+Argument *app* is flask application, and *error* is function that gets called
+if access is denied, or wrapper fails for any other reason and *request* has already been
+explained, and determines which type of LTI requests are allowed.
+*role* argument is optional and mapping between pylti roles and roles defined in LTI
+standard is described by *pylti.common.LTI_ROLES*.
 
 .. code-block:: python
 

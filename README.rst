@@ -31,7 +31,7 @@ Django     mit_lti_django_sample
 Bottle     mit_lti_bottle_sample
 =========  ============
 
-_Documentation is available on readthedocs.
+Documentation_ is available on readthedocs.
 
 .. rubric:: Footnotes
 

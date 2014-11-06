@@ -15,6 +15,7 @@ Flask application.
 Next let's look at how we can protect landing page using pylti wrapper. Note two things:
  * We use *@lti* decorator to protect route
  * Route takes named argument *lti* which provides way to interact with LTI consumer
+   *lti* object is an instance of :py:class:`pylti.flask.LTI` .
 
 .. code-block:: python
 
@@ -104,4 +105,5 @@ standard is described by *pylti.common.LTI_ROLES*.
         """
         app_exception.set(exception)
         return "HTML to return"
+
 

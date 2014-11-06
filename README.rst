@@ -8,6 +8,8 @@ PyLTI - LTI done right
 .. image:: https://coveralls.io/repos/mitodl/pylti/badge.png?branch=develop
   :target: https://coveralls.io/r/mitodl/pylti?branch=develop
 
+.. _Documentation: http://pylti.readthedocs.org/en/latest/
+
 PyLTI is a Python implementation of the LTI specification [#f1]_.  It supports
 LTI 1.1.1 and LTI 2.0.  While it was written with edX as its LTI consumer, it
 is a complete implementation of the LTI specification and can be used with any
@@ -29,6 +31,7 @@ Django     mit_lti_django_sample
 Bottle     mit_lti_bottle_sample
 =========  ============
 
+_Documentation is available on readthedocs.
 
 .. rubric:: Footnotes
 

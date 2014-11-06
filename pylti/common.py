@@ -128,6 +128,7 @@ def _post_patched_request(body, client, url, method, content_type):
     """
     Authorization header needs to be capitalized for some LTI clients
     this function ensures that header is capitalized
+
     :param body: body of the call
     :param client: OAuth Client
     :param url: outcome url
@@ -168,6 +169,7 @@ def _post_patched_request(body, client, url, method, content_type):
 def post_message(consumers, lti_key, url, body):
     """
         Posts a signed message to LTI consumer
+
     :param consumers: consumers from config
     :param lti_key: key to find appropriate consumer
     :param url: post url
@@ -200,11 +202,12 @@ def post_message(consumers, lti_key, url, body):
 def post_message2(consumers, lti_key, url, body,
                   method='POST', content_type='application/xml'):
     """
-        Posts a signed message to LTI consumer
-    :param consumers: consumers from config
-    :param lti_key: key to find appropriate consumer
-    :param url: post url
-    :param body: xml body
+        Posts a signed message to LTI consumer using LTI 2.0 format
+
+    :param: consumers: consumers from config
+    :param: lti_key: key to find appropriate consumer
+    :param: url: post url
+    :param: body: xml body
     :return: success
     """
     oauth_store = LTIOAuthDataStore(consumers)
@@ -232,6 +235,7 @@ def post_message2(consumers, lti_key, url, body,
 def verify_request_common(consumers, url, method, headers, params):
     """
     Verifies that request is valid
+
     :param consumers: consumers from config file
     :param url: request url
     :param method: request method
@@ -283,6 +287,7 @@ def generate_request_xml(message_identifier_id, operation,
                          lis_result_sourcedid, score):
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.
+
     :param message_identifier_id:
     :param operation:
     :param lis_result_sourcedid:

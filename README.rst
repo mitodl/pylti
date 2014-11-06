@@ -1,5 +1,10 @@
 PyLTI - LTI done right
 =========================
+:PyLTI: Python implementation of LTI
+:Version: 0.1.3
+:Author: MIT Office of Digital Learning
+:Homepage: http://odl.mit.edu
+:License: BSD
 
 .. image:: https://secure.travis-ci.org/mitodl/pylti.png?branch=develop
   :target: https://secure.travis-ci.org/mitodl/pylti
@@ -9,7 +14,7 @@ PyLTI - LTI done right
   :target: https://coveralls.io/r/mitodl/pylti?branch=develop
 
 PyLTI is a Python implementation of the LTI specification [#f1]_.  It supports
-LTI 1.1.1 and LTI 2.0.  While it was written with edX as its LTI consumer, it
+LTI 1.1.1 and LTI 2.0.  While it was written with edX[#f2]_ as its LTI consumer, it
 is a complete implementation of the LTI specification and can be used with any
 learning management system that supports LTI.
 
@@ -22,13 +27,36 @@ To demonstrate this usage, there are also a collection of example LTI tools
 written to support different Python web frameworks.
 
 =========  ============
-Framework  Example code
+Framework  Example
 =========  ============
-Flask      mit_lti_flask_sample
-Django     mit_lti_django_sample
-Bottle     mit_lti_bottle_sample
+Flask      `mit_lti_flask_sample
+           <https://github.mit.edu/mitxlti/mit_lti_flask_sample>`_ A skeleton
+           example for the Flask framework that consumes the PyLTI library
+Django     coming soon
+Bottle     coming soon
 =========  ============
 
+Dependencies:
+=============
+* Python 2.6+
+* Flask 0.10.1
+* httpretty 0.8.3
+* lxml 3.4.0
+* oauth 1.0.1
+* oauth2 1.5.211
+* oauthlib 0.6.3
+* pyflakes 0.8.1
+* pytest 2.6.3
+* pytest-cache 1.0
+* pytest-cov 1.8.0
+* pytest-flakes 0.2
+* pytest-pep8 1.0.6
+* httplib2 0.9
+* sphinx 1.2.3
+
+Licensing
+=========
+PyLTI is licensed under the BSD
 
 .. rubric:: Footnotes
 
@@ -36,3 +64,7 @@ Bottle     mit_lti_bottle_sample
    initiative of IMS.  Their site `http://developers.imsglobal.org/
    <http://developers.imsglobal.org/>`_ contains a description of LTI as well as
    the current LTI specification.
+.. [#f2] EdX offers interactive online classes and MOOCs from the world’s best
+   universities. Online courses from MITx, HarvardX, BerkeleyX, UTx and many
+   other universities.  EdX is a non-profit online initiative created by
+   founding partners Harvard and MIT. `edx.org <http://edx.org>`_

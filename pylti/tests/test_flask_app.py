@@ -87,7 +87,7 @@ def name(lti):
     :param lti: `lti` object
     :return: string "hi"
     """
-    return lti.name()
+    return lti.name
 
 
 @app.route("/initial_staff", methods=['GET', 'POST'])

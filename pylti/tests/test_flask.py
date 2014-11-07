@@ -409,7 +409,6 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url,
                                                lit_outcome_service_url=uri)
-
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -473,8 +472,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade2/1.0")
         self.assertTrue(self.has_exception())
         self.assertEqual(ret.data, "error")

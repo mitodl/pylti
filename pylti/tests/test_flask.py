@@ -273,7 +273,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                   'lti_version': u'LTI-1p0',
                   'launch_presentation_return_url': u'',
                   'lis_outcome_service_url': (lit_outcome_service_url
-                                              or u'https://edge.edx.org/'
+                                              or u'https://example.edu/'
                                                  u'courses/MITx/ODL_ENG/'
                                                  u'2014_T1/xblock/i4x:;_;'
                                                  u'_MITx;_ODL_ENG;_lti;'
@@ -344,7 +344,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Check post_grade functionality
         """
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
@@ -374,7 +374,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Check post_grade functionality fails on invalid response
         """
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
@@ -427,7 +427,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Check post_grade edX LTI2 functionality
         """
 
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/lti_2_0_result_rest_handler/user/'
@@ -459,7 +459,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Check post_grade edX LTI2 functionality
         """
 
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/lti_2_0_result_rest_handler/user/'

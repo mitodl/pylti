@@ -9,10 +9,16 @@ import json
 
 from flask import session, request
 
-from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
-                     LTI_ROLES, verify_request_common,
-                     post_message, post_message2, generate_request_xml,
-                     LTIException, LTIRoleException, LTINotInSessionException,
+from .common import (LTI_SESSION_KEY,
+                     LTI_PROPERTY_LIST,
+                     LTI_ROLES,
+                     verify_request_common,
+                     post_message,
+                     post_message2,
+                     generate_request_xml,
+                     LTIException,
+                     LTIRoleException,
+                     LTINotInSessionException,
                      LTIPostMessageException)
 
 

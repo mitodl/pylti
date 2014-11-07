@@ -139,6 +139,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Accessing LTI after session established
         """
         self.app.get('/setup_session')
+
         self.app.get('/session')
         self.assertFalse(self.has_exception())
 
@@ -146,12 +147,16 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Accessing LTI after session closed
         """
-
         self.app.get('/setup_session')
+
         self.app.get('/session')
+
         self.assertFalse(self.has_exception())
+
         self.app.get('/close_session')
+
         self.app.get('/session')
+
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource(self):
@@ -161,6 +166,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -173,6 +179,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         add_params = {u'lis_person_sourcedid': u'person'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'person')
@@ -186,6 +193,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         add_params = {u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'email@email.com')
@@ -200,6 +208,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                       u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'person')
@@ -212,6 +221,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_staff?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Student')
+
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
@@ -223,6 +233,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_staff?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Administrator')
+
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -234,6 +245,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_unknown?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Administrator')
+
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
@@ -303,6 +315,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
+
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -319,6 +332,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
+
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -343,11 +357,14 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=True")
+
         ret = self.app.get("/post_grade/2.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")
@@ -372,6 +389,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertTrue(self.has_exception())
         self.assertEqual(ret.data, "error")
@@ -391,11 +409,14 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url,
                                                lit_outcome_service_url=uri)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=True")
+
         ret = self.app.get("/post_grade/2.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")
@@ -420,11 +441,14 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade2/1.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=True")
+
         ret = self.app.get("/post_grade2/2.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")

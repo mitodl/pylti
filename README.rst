@@ -13,6 +13,8 @@ PyLTI - LTI done right
 .. image:: https://coveralls.io/repos/mitodl/pylti/badge.png?branch=develop
   :target: https://coveralls.io/r/mitodl/pylti?branch=develop
 
+.. _Documentation: http://pylti.readthedocs.org/en/latest/
+
 PyLTI is a Python implementation of the LTI specification [#f1]_.  It supports
 LTI 1.1.1 and LTI 2.0.  While it was written with edX[#f2]_ as its LTI consumer, it
 is a complete implementation of the LTI specification and can be used with any
@@ -53,6 +55,7 @@ Dependencies:
 * pytest-pep8 1.0.6
 * httplib2 0.9
 * sphinx 1.2.3
+Documentation_ is available on readthedocs.
 
 Licensing
 =========

@@ -10,11 +10,18 @@ import json
 from flask import session
 from flask import request as flask_request
 
-from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
-                     LTI_ROLES, verify_request_common,
-                     post_message, post_message2, generate_request_xml,
-                     LTIException, LTIRoleException, LTINotInSessionException,
-                     LTIPostMessageException)
+from .common import (
+    LTI_SESSION_KEY,
+    LTI_PROPERTY_LIST,
+    LTI_ROLES,
+    verify_request_common,
+    post_message,
+    post_message2,
+    generate_request_xml,
+    LTIException,
+    LTIRoleException,
+    LTINotInSessionException,
+    LTIPostMessageException)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name

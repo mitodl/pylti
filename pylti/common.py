@@ -197,6 +197,7 @@ def post_message(consumers, lti_key, url, body):
     log.debug("url {}".format(url))
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
+
     is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
     log.debug("is success {}".format(is_success))
     return is_success
@@ -234,6 +235,7 @@ def post_message2(consumers, lti_key, url, body,
     log.debug("url {}".format(url))
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
+
     is_success = response.status == 200
     log.debug("is success {}".format(is_success))
 
@@ -329,6 +331,7 @@ def generate_request_xml(message_identifier_id, operation,
         text_string.text = score.__str__()
     ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
         etree.tostring(root, encoding='utf-8'))
-    log.debug("XML Response: \n{}".format(
-        ret))
+
+    log.debug("XML Response: \n{}".format(ret))
+    
     return ret

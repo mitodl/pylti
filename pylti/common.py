@@ -333,5 +333,4 @@ def generate_request_xml(message_identifier_id, operation,
         etree.tostring(root, encoding='utf-8'))
 
     log.debug("XML Response: \n{}".format(ret))
-    
     return ret

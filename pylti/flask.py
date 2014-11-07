@@ -32,8 +32,9 @@ class LTI(object):
     def __init__(self, lti_args, lti_kwargs):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
-        self.nickname = self.name()
+        self.nickname = self.name
 
+    @property
     def name(self):
         """
         Name returns user's name or user's email or user_id
@@ -48,6 +49,7 @@ class LTI(object):
         else:
             return ''
 
+    @property
     def user_id(self):
         """
         Returns user_id as provided by LTI
@@ -106,6 +108,7 @@ class LTI(object):
         consumers = config.get('consumers', dict())
         return consumers
 
+    @property
     def key(self):
         """
         OAuth Consumer Key
@@ -121,6 +124,7 @@ class LTI(object):
         """
         return "edX_fix"
 
+    @property
     def lis_result_sourcedid(self):
         """
         lis_result_sourcedid to use to XML callback
@@ -129,6 +133,7 @@ class LTI(object):
         """
         return session['lis_result_sourcedid']
 
+    @property
     def role(self):
         """
         LTI roles
@@ -165,10 +170,11 @@ class LTI(object):
         if 'role' in self.lti_kwargs:
             role = self.lti_kwargs['role']
         log.debug("check_role lti_role={} decorator_role={}"
-                  .format(self.role(), role))
+                  .format(self.role, role))
         if not self.is_role(role):
             raise LTIRoleException('Not authorized.')
 
+    @property
     def response_url(self):
         """
         Returns remapped lis_outcome_service_url
@@ -236,15 +242,15 @@ class LTI(object):
         """
         message_identifier_id = self.message_identifier_id()
         operation = 'replaceResult'
-        lis_result_sourcedid = self.lis_result_sourcedid()
+        lis_result_sourcedid = self.lis_result_sourcedid
         # # edX devbox fix
         score = float(grade)
         if 0 <= score <= 1.0:
             xml = generate_request_xml(
                 message_identifier_id, operation, lis_result_sourcedid,
                 score)
-            ret = post_message(self._consumers(), self.key(),
-                               self.response_url(), xml)
+            ret = post_message(self._consumers(), self.key,
+                               self.response_url, xml)
             if not ret:
                 raise LTIPostMessageException("Post Message Failed")
             return True
@@ -261,8 +267,8 @@ class LTI(object):
         """
         content_type = 'application/vnd.ims.lis.v2.result+json'
         if user is None:
-            user = self.user_id()
-        lti2_url = self.response_url().replace(
+            user = self.user_id
+        lti2_url = self.response_url.replace(
             "/grade_handler",
             "/lti_2_0_result_rest_handler/user/{}".format(user))
         score = float(grade)
@@ -273,7 +279,7 @@ class LTI(object):
                 "resultScore": score,
                 "comment": comment
             })
-            ret = post_message2(self._consumers(), self.key(), lti2_url, body,
+            ret = post_message2(self._consumers(), self.key, lti2_url, body,
                                 method='PUT',
                                 content_type=content_type)
             if not ret:

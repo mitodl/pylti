@@ -16,7 +16,7 @@ PyLTI - LTI done right
 .. _Documentation: http://pylti.readthedocs.org/en/latest/
 
 PyLTI is a Python implementation of the LTI specification [#f1]_.  It supports
-LTI 1.1.1 and LTI 2.0.  While it was written with edX[#f2]_ as its LTI consumer, it
+LTI 1.1.1 and LTI 2.0.  While it was written with edX [#f2]_ as its LTI consumer, it
 is a complete implementation of the LTI specification and can be used with any
 learning management system that supports LTI.
 
@@ -32,8 +32,8 @@ written to support different Python web frameworks.
 Framework  Example
 =========  ============
 Flask      `mit_lti_flask_sample
-           <https://github.mit.edu/mitxlti/mit_lti_flask_sample>`_ A skeleton
-           example for the Flask framework that consumes the PyLTI library
+           <https://github.mit.edu/mitxlti/mit_lti_flask_sample>`_
+           A skeleton example for the Flask framework that consumes the PyLTI library
 Django     coming soon
 Bottle     coming soon
 =========  ============
@@ -55,11 +55,13 @@ Dependencies:
 * pytest-pep8 1.0.6
 * httplib2 0.9
 * sphinx 1.2.3
+
 Documentation_ is available on readthedocs.
 
 Licensing
 =========
-PyLTI is licensed under the BSD
+PyLTI is licensed under the BSD license, version January 9, 2008.  See
+license.rst for the full text of the license.
 
 .. rubric:: Footnotes
 
@@ -70,4 +72,4 @@ PyLTI is licensed under the BSD
 .. [#f2] EdX offers interactive online classes and MOOCs from the world’s best
    universities. Online courses from MITx, HarvardX, BerkeleyX, UTx and many
    other universities.  EdX is a non-profit online initiative created by
-   founding partners Harvard and MIT. `edx.org <http://edx.org>`_
+   founding partners Harvard and MIT. `code.edx.org <http://code.edx.org>`_

@@ -12,6 +12,8 @@ if sys.version_info < (2, 6):
     print >> sys.stderr, error
     sys.exit(1)
 
+extra = dict()
+
 try:
     from setuptools import setup, find_packages
     from setuptools.command.test import test as testcommand
@@ -67,7 +69,7 @@ try:
                      "httplib2>=0.9" ],
                  include_package_data=True,
                  zip_safe=False)
-except ImportError:
+except ImportError as err:
     import string
     from distutils.core import setup
 
@@ -112,6 +114,11 @@ except ImportError:
 
             out = [item for item in out if not fnmatchcase(item, pat)]
         return out
+
+    print "Non-Fatal Error:", err, "\n"
+    print "Setup encountered an error while importing setuptools (see above)."
+    print "Proceeding anyway with manual replacements for setuptools.find_packages."
+    print "Try installing setuptools if you continue to have problems.\n\n"
 
 VERSION = __import__('pylti').VERSION
 

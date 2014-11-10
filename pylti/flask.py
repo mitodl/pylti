@@ -267,6 +267,8 @@ class LTI(object):
     def post_grade2(self, grade, user=None, comment=''):
         """
         Post grade to LTI consumer using REST/JSON
+        URL munging will is related to:
+        https://openedx.atlassian.net/browse/PLAT-281
 
         :param: grade: 0 <= grade <= 1
         :return: True is post successful and grade valid

@@ -12,8 +12,6 @@ if sys.version_info < (2, 6):
     print >> sys.stderr, error
     sys.exit(1)
 
-extra = dict()
-
 try:
     from setuptools import setup, find_packages
     from setuptools.command.test import test as testcommand
@@ -119,6 +117,8 @@ except ImportError as err:
     print "Setup encountered an error while importing setuptools (see above)."
     print "Proceeding anyway with manual replacements for setuptools.find_packages."
     print "Try installing setuptools if you continue to have problems.\n\n"
+
+    extra = dict()
 
 VERSION = __import__('pylti').VERSION
 

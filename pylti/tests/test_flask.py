@@ -139,6 +139,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Accessing LTI after session established
         """
         self.app.get('/setup_session')
+
         self.app.get('/session')
         self.assertFalse(self.has_exception())
 
@@ -146,12 +147,16 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Accessing LTI after session closed
         """
-
         self.app.get('/setup_session')
+
         self.app.get('/session')
+
         self.assertFalse(self.has_exception())
+
         self.app.get('/close_session')
+
         self.app.get('/session')
+
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource(self):
@@ -161,6 +166,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -173,6 +179,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         add_params = {u'lis_person_sourcedid': u'person'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'person')
@@ -186,6 +193,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         add_params = {u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'email@email.com')
@@ -200,6 +208,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                       u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(consumers, url,
                                                add_params=add_params)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, u'person')
@@ -212,6 +221,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_staff?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Student')
+
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
@@ -223,6 +233,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_staff?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Administrator')
+
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -234,6 +245,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/initial_unknown?'
         new_url = self.generate_launch_request(consumers, url,
                                                roles='Administrator')
+
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
@@ -261,7 +273,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                   'lti_version': u'LTI-1p0',
                   'launch_presentation_return_url': u'',
                   'lis_outcome_service_url': (lit_outcome_service_url
-                                              or u'https://edge.edx.org/'
+                                              or u'https://example.edu/'
                                                  u'courses/MITx/ODL_ENG/'
                                                  u'2014_T1/xblock/i4x:;_;'
                                                  u'_MITx;_ODL_ENG;_lti;'
@@ -303,6 +315,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
+
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -319,6 +332,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
+
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -330,7 +344,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Check post_grade functionality
         """
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
@@ -343,11 +357,14 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(consumers, url)
+
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=True")
+
         ret = self.app.get("/post_grade/2.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")
@@ -357,7 +374,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Check post_grade functionality fails on invalid response
         """
-        uri = (u'https://edge.edx.org/courses/MITx/ODL_ENG/2014_T1/xblock/'
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
@@ -372,6 +389,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertTrue(self.has_exception())
         self.assertEqual(ret.data, "error")
@@ -393,9 +411,71 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                                lit_outcome_service_url=uri)
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+
         ret = self.app.get("/post_grade/1.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=True")
+
         ret = self.app.get("/post_grade/2.0")
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")
+
+    @httpretty.activate
+    def test_access_to_oauth_resource_post_grade2(self):
+        """
+        Check post_grade edX LTI2 functionality
+        """
+
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
+               u'i4x:;_;_MITx;_ODL_ENG;_lti;'
+               u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
+               u'/lti_2_0_result_rest_handler/user/'
+               u'008437924c9852377e8994829aaac7a1')
+
+        def request_callback(request, cburi, headers):
+            return 200, headers, self.expected_response
+
+        httpretty.register_uri(httpretty.PUT, uri, body=request_callback)
+
+        consumers = self.consumers
+        url = 'http://localhost/initial?'
+        new_url = self.generate_launch_request(consumers, url)
+
+        ret = self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+        ret = self.app.get("/post_grade2/1.0")
+        self.assertFalse(self.has_exception())
+        self.assertEqual(ret.data, "grade=True")
+
+        ret = self.app.get("/post_grade2/2.0")
+        self.assertFalse(self.has_exception())
+        self.assertEqual(ret.data, "grade=False")
+
+    @httpretty.activate
+    def test_access_to_oauth_resource_post_grade2_fail(self):
+        """
+        Check post_grade edX LTI2 functionality
+        """
+
+        uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
+               u'i4x:;_;_MITx;_ODL_ENG;_lti;'
+               u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
+               u'/lti_2_0_result_rest_handler/user/'
+               u'008437924c9852377e8994829aaac7a1')
+
+        def request_callback(request, cburi, headers):
+            return 400, headers, self.expected_response
+
+        httpretty.register_uri(httpretty.PUT, uri, body=request_callback)
+
+        consumers = self.consumers
+        url = 'http://localhost/initial?'
+        new_url = self.generate_launch_request(consumers, url)
+
+        ret = self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+        ret = self.app.get("/post_grade2/1.0")
+        self.assertTrue(self.has_exception())
+        self.assertEqual(ret.data, "error")

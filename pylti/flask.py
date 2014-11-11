@@ -10,11 +10,18 @@ import json
 from flask import session
 from flask import request as flask_request
 
-from .common import (LTI_SESSION_KEY, LTI_PROPERTY_LIST,
-                     LTI_ROLES, verify_request_common,
-                     post_message, post_message2, generate_request_xml,
-                     LTIException, LTIRoleException, LTINotInSessionException,
-                     LTIPostMessageException)
+from .common import (
+    LTI_SESSION_KEY,
+    LTI_PROPERTY_LIST,
+    LTI_ROLES,
+    verify_request_common,
+    post_message,
+    post_message2,
+    generate_request_xml,
+    LTIException,
+    LTIRoleException,
+    LTINotInSessionException,
+    LTIPostMessageException)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
@@ -260,6 +267,8 @@ class LTI(object):
     def post_grade2(self, grade, user=None, comment=''):
         """
         Post grade to LTI consumer using REST/JSON
+        URL munging will is related to:
+        https://openedx.atlassian.net/browse/PLAT-281
 
         :param: grade: 0 <= grade <= 1
         :return: True is post successful and grade valid

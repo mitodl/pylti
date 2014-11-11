@@ -186,14 +186,20 @@ def post_message(consumers, lti_key, url, body):
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
-    (response, content) = _post_patched_request(body, client, url,
-                                                method, content_type)
+    (response, content) = _post_patched_request(
+        body,
+        client,
+        url,
+        method,
+        content_type
+    )
 
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
+
     is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
     log.debug("is success {}".format(is_success))
     return is_success
@@ -218,8 +224,13 @@ def post_message2(consumers, lti_key, url, body,
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
-    (response, content) = _post_patched_request(body, client, url,
-                                                method, content_type)
+    (response, content) = _post_patched_request(
+        body,
+        client,
+        url,
+        method,
+        content_type
+    )
 
     log.debug("POST MESSAGE 2")
     log.debug("key {}".format(lti_key))
@@ -227,8 +238,10 @@ def post_message2(consumers, lti_key, url, body,
     log.debug("url {}".format(url))
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
+
     is_success = response.status == 200
     log.debug("is success {}".format(is_success))
+
     return is_success
 
 
@@ -249,6 +262,7 @@ def verify_request_common(consumers, url, method, headers, params):
     log.debug("method {}".format(method))
     log.debug("headers {}".format(headers))
     log.debug("params {}".format(params))
+
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(
@@ -322,6 +336,6 @@ def generate_request_xml(message_identifier_id, operation,
         text_string.text = score.__str__()
     ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
         etree.tostring(root, encoding='utf-8'))
-    log.debug("XML Response: \n{}".format(
-        ret))
+
+    log.debug("XML Response: \n{}".format(ret))
     return ret

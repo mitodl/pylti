@@ -38,7 +38,7 @@ Flask      `mit_lti_flask_sample
 
 Dependencies:
 =============
-* Python 2.6+
+* Python 2.7+
 * oauth 1.0.1+
 * oauth2 1.5.211+
 * httplib2 0.9+

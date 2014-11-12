@@ -7,8 +7,8 @@
 import os
 import sys
 
-if sys.version_info < (2, 6):
-    error = "ERROR: PyLTI requires Python 2.6+ ... exiting."
+if sys.version_info < (2, 7):
+    error = "ERROR: PyLTI requires Python 2.7+ ... exiting."
     print >> sys.stderr, error
     sys.exit(1)
 

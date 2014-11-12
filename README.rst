@@ -34,18 +34,19 @@ Framework  Example
 Flask      `mit_lti_flask_sample
            <https://github.mit.edu/mitxlti/mit_lti_flask_sample>`_
            A skeleton example for the Flask framework that consumes the PyLTI library
-Django     coming soon
-Bottle     coming soon
 =========  ============
 
 Dependencies:
 =============
 * Python 2.6+
+* oauth 1.0.1+
+* oauth2 1.5.211+
+* httplib2 0.9+
+
+Development dependencies:
+=========================
 * Flask 0.10.1
 * httpretty 0.8.3
-* lxml 3.4.0
-* oauth 1.0.1
-* oauth2 1.5.211
 * oauthlib 0.6.3
 * pyflakes 0.8.1
 * pytest 2.6.3
@@ -53,7 +54,6 @@ Dependencies:
 * pytest-cov 1.8.0
 * pytest-flakes 0.2
 * pytest-pep8 1.0.6
-* httplib2 0.9
 * sphinx 1.2.3
 
 Documentation_ is available on readthedocs.

@@ -22,7 +22,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyLTI'
-copyright = u'2014, ODL Engineering'
+copyright = u'2014, Massachusetts Institute of Technology'
 
 static_mod = os.path.join('..','..', 'pylti', '__init__.py')
 execfile(static_mod)

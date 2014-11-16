@@ -1,9 +1,9 @@
 Getting started with PyLTI using Flask
 ======================================
 
-PyLTI provides authorization decorator for Flask requests.
+PyLTI provides an authorization decorator for Flask requests.
 
-To use pylti you will need to import the pylti flask decorator, and create a Flask application.
+To use ``pylti`` you will need to import the ``pylti`` Flask decorator, and create a Flask application.
 
 .. code-block:: python
 
@@ -11,9 +11,9 @@ To use pylti you will need to import the pylti flask decorator, and create a Fla
 
     app = Flask(__name__)
 
-Next let's look at how we can protect the landing page using pylti decorator. Note two things:
- * We use *@lti* decorator to protect route
- * Route takes named argument *lti* which provides way to interact with an LTI consumer
+Next let's look at how we can protect the landing page using the ``pylti`` decorator. Note two things:
+ * The *@lti* decorator protects the route
+ * The route takes a named argument *lti* which interacts with an LTI consumer
    *lti* object is an instance of :py:class:`pylti.flask.LTI` .
 
 .. code-block:: python
@@ -32,8 +32,8 @@ Next let's look at how we can protect the landing page using pylti decorator. No
         return "Landing page"
 
 
-We may have different needs, and maybe we want our landing to only be available for the initial request.
-To allow only initial requests to be accessible one can use *request='initial'* as an argument to the decorator.
+You may have different needs; maybe you want your landing page available only for the initial request.
+For access on the initial requests only, use *request='initial'* as an argument to the decorator.
 
 .. code-block:: python
 
@@ -48,8 +48,8 @@ To allow only initial requests to be accessible one can use *request='initial'* 
         """
         return "Initial request"
 
-And than some pages should be available after initial page was visited.
-To allow only subsequent requests to be accessible one can use *request='session'* as an argument to the decorator.
+You may want some pages available only after the initial page is visited.
+To allow only subsequent requests to be accessible use *request='session'* as an argument to the decorator.
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ To allow only subsequent requests to be accessible one can use *request='session
         return "Session request"
 
 
-Often times in your LTI Tool Provider, some pages need to be restricted to administrators.
+Often times in your LTI Tool Provider, some pages are accessible only by administrators.
 To protect those pages you can use *role* attribute.
 
 .. code-block:: python
@@ -81,12 +81,12 @@ To protect those pages you can use *role* attribute.
         """
         return "Staff page"
 
-There are a number of arguments to *@lti* that may need to explained. Required arguments
-are *app*, *error* and *request*, and optional arguments is *role*
-Argument *app* is flask application, and *error* is function that gets called
-if access is denied, or decorator fails for any other reason and *request* has already been
+*@lti* has a number of arguments. The required arguments
+are *app*, *error* and *request*.  The *role* argument is optional.
+Argument *app* is the Flask application.  Argument *error* is the function that gets called
+if access is denied, or decorator fails for any other reason. *request* has already been
 explained, and determines which type of LTI requests are allowed.
-*role* argument is optional and mapping between pylti roles and roles defined in LTI
+The *role* argument is optional.  Mapping between pylti roles and the roles defined in the LTI
 standard is described by *pylti.common.LTI_ROLES*.
 
 .. code-block:: python

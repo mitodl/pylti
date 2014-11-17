@@ -85,7 +85,7 @@ class LTI(object):
 
     def _verify_any(self):
         """
-        Verify is request is in session or initial request
+        Verify that request is in session or initial request
 
         :raises: LTIException
         """
@@ -97,7 +97,7 @@ class LTI(object):
 
     def _verify_session(self):
         """
-        Verify is session was already created
+        Verify that session was already created
 
         :raises: LTIException
         """
@@ -125,7 +125,7 @@ class LTI(object):
 
     def message_identifier_id(self):
         """
-        Message identifier to use to XML callback
+        Message identifier to use for XML callback
 
         :return: non-empty string
         """
@@ -134,7 +134,7 @@ class LTI(object):
     @property
     def lis_result_sourcedid(self):
         """
-        lis_result_sourcedid to use to XML callback
+        lis_result_sourcedid to use for XML callback
 
         :return: LTI lis_result_sourcedid
         """
@@ -169,7 +169,7 @@ class LTI(object):
 
     def _check_role(self):
         """
-        Check is user is in role specified as wrapper attribute
+        Check that user is in role specified as wrapper attribute
 
         :exception: LTIException if user is not in roles
         """

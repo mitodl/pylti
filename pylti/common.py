@@ -12,7 +12,6 @@ from xml.etree import ElementTree as etree
 
 log = logging.getLogger('pylti.common')  # pylint: disable=invalid-name
 
-
 LTI_PROPERTY_LIST = [
     'oauth_consumer_key',
     'launch_presentation_return_url',
@@ -125,10 +124,11 @@ class LTIPostMessageException(LTIException):
     pass
 
 
-def _post_patched_request(body, client, url):
+def _post_patched_request(body, client, url, method, content_type):
     """
     Authorization header needs to be capitalized for some LTI clients
     this function ensures that header is capitalized
+
     :param body: body of the call
     :param client: OAuth Client
     :param url: outcome url
@@ -155,9 +155,9 @@ def _post_patched_request(body, client, url):
     # pylint: disable=unused-variable
     response, content = client.request(
         url,
-        'POST',
+        method,
         body=body,
-        headers={'Content-Type': 'application/xml'})
+        headers={'Content-Type': content_type})
 
     http = httplib2.Http
     # pylint: disable=protected-access
@@ -169,10 +169,51 @@ def _post_patched_request(body, client, url):
 def post_message(consumers, lti_key, url, body):
     """
         Posts a signed message to LTI consumer
+
     :param consumers: consumers from config
     :param lti_key: key to find appropriate consumer
     :param url: post url
     :param body: xml body
+    :return: success
+    """
+    content_type = 'application/xml'
+    method = 'POST'
+    oauth_store = LTIOAuthDataStore(consumers)
+    oauth_server = oauth.OAuthServer(oauth_store)
+    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
+    lti_consumer = oauth_store.lookup_consumer(lti_key)
+    secret = lti_consumer.secret
+
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+    (response, content) = _post_patched_request(
+        body,
+        client,
+        url,
+        method,
+        content_type
+    )
+
+    log.debug("key {}".format(lti_key))
+    log.debug("secret {}".format(secret))
+    log.debug("url {}".format(url))
+    log.debug("response {}".format(response))
+    log.debug("content {}".format(content))
+
+    is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
+    log.debug("is success {}".format(is_success))
+    return is_success
+
+
+def post_message2(consumers, lti_key, url, body,
+                  method='POST', content_type='application/xml'):
+    """
+        Posts a signed message to LTI consumer using LTI 2.0 format
+
+    :param: consumers: consumers from config
+    :param: lti_key: key to find appropriate consumer
+    :param: url: post url
+    :param: body: xml body
     :return: success
     """
     oauth_store = LTIOAuthDataStore(consumers)
@@ -183,21 +224,31 @@ def post_message(consumers, lti_key, url, body):
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
-    (response, content) = _post_patched_request(body, client, url)
+    (response, content) = _post_patched_request(
+        body,
+        client,
+        url,
+        method,
+        content_type
+    )
 
+    log.debug("POST MESSAGE 2")
     log.debug("key {}".format(lti_key))
     log.debug("secret {}".format(secret))
     log.debug("url {}".format(url))
     log.debug("response {}".format(response))
     log.debug("content {}".format(content))
-    is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
+
+    is_success = response.status == 200
     log.debug("is success {}".format(is_success))
+
     return is_success
 
 
 def verify_request_common(consumers, url, method, headers, params):
     """
     Verifies that request is valid
+
     :param consumers: consumers from config file
     :param url: request url
     :param method: request method
@@ -211,6 +262,7 @@ def verify_request_common(consumers, url, method, headers, params):
     log.debug("method {}".format(method))
     log.debug("headers {}".format(headers))
     log.debug("params {}".format(params))
+
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(
@@ -249,6 +301,7 @@ def generate_request_xml(message_identifier_id, operation,
                          lis_result_sourcedid, score):
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.
+
     :param message_identifier_id:
     :param operation:
     :param lis_result_sourcedid:
@@ -283,6 +336,6 @@ def generate_request_xml(message_identifier_id, operation,
         text_string.text = score.__str__()
     ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
         etree.tostring(root, encoding='utf-8'))
-    log.debug("XML Response: \n{}".format(
-        ret))
+
+    log.debug("XML Response: \n{}".format(ret))
     return ret

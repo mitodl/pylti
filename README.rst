@@ -32,7 +32,7 @@ written to support different Python web frameworks.
 Framework  Example
 =========  ============
 Flask      `mit_lti_flask_sample
-           <https://github.mit.edu/mitxlti/mit_lti_flask_sample>`_
+           <https://github.com/mitodl/mit_lti_flask_sample>`_
            A skeleton example for the Flask framework that consumes the PyLTI library
 =========  ============
 

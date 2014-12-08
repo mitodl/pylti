@@ -82,6 +82,23 @@ class LTIOAuthDataStore(oauth.OAuthDataStore):
             return None
         return oauth.OAuthConsumer(key, secret)
 
+    def lookup_cert(self, key):
+        """
+        Search through keys
+        """
+        if not self.consumers:
+            log.critical(("No consumers defined in settings."
+                          "Have you created a configuration file?"))
+            return None
+
+        consumer = self.consumers.get(key)
+        if not consumer:
+            log.info("Did not find consumer, using key: %s ", key)
+            return None
+
+        cert = consumer.get('cert', None)
+        return cert
+
     def lookup_nonce(self, oauth_consumer, oauth_token, nonce):
         """
         Lookup nonce should check if nonce was already used
@@ -182,16 +199,22 @@ def post_message(consumers, lti_key, url, body):
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
     lti_consumer = oauth_store.lookup_consumer(lti_key)
+    lti_cert = oauth_store.lookup_cert(lti_key)
+
     secret = lti_consumer.secret
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
+
+    if lti_cert:
+        client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
+
     (response, content) = _post_patched_request(
         body,
         client,
         url,
         method,
-        content_type
+        content_type,
     )
 
     log.debug("key {}".format(lti_key))
@@ -220,16 +243,22 @@ def post_message2(consumers, lti_key, url, body,
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
     lti_consumer = oauth_store.lookup_consumer(lti_key)
+    lti_cert = oauth_store.lookup_cert(lti_key)
+
     secret = lti_consumer.secret
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
     client = oauth2.Client(consumer)
+
+    if lti_cert:
+        client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
+
     (response, content) = _post_patched_request(
         body,
         client,
         url,
         method,
-        content_type
+        content_type,
     )
 
     log.debug("POST MESSAGE 2")

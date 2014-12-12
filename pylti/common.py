@@ -141,7 +141,8 @@ class LTIPostMessageException(LTIException):
     pass
 
 
-def _post_patched_request(body, client, url, method, content_type):
+def _post_patched_request(consumers, lti_key, body,
+                          url, method, content_type):
     """
     Authorization header needs to be capitalized for some LTI clients
     this function ensures that header is capitalized
@@ -151,6 +152,21 @@ def _post_patched_request(body, client, url, method, content_type):
     :param url: outcome url
     :return: response
     """
+
+    oauth_store = LTIOAuthDataStore(consumers)
+    oauth_server = oauth.OAuthServer(oauth_store)
+    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
+    lti_consumer = oauth_store.lookup_consumer(lti_key)
+    lti_cert = oauth_store.lookup_cert(lti_key)
+
+    secret = lti_consumer.secret
+
+    consumer = oauth2.Consumer(key=lti_key, secret=secret)
+    client = oauth2.Client(consumer)
+
+    if lti_cert:
+        client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
+
     import httplib2
 
     http = httplib2.Http
@@ -180,6 +196,12 @@ def _post_patched_request(body, client, url, method, content_type):
     # pylint: disable=protected-access
     http._normalize_headers = monkey_patch_function
 
+    log.debug("key {}".format(lti_key))
+    log.debug("secret {}".format(secret))
+    log.debug("url {}".format(url))
+    log.debug("response {}".format(response))
+    log.debug("content {}".format(content))
+
     return response, content
 
 
@@ -195,33 +217,14 @@ def post_message(consumers, lti_key, url, body):
     """
     content_type = 'application/xml'
     method = 'POST'
-    oauth_store = LTIOAuthDataStore(consumers)
-    oauth_server = oauth.OAuthServer(oauth_store)
-    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
-    lti_consumer = oauth_store.lookup_consumer(lti_key)
-    lti_cert = oauth_store.lookup_cert(lti_key)
-
-    secret = lti_consumer.secret
-
-    consumer = oauth2.Consumer(key=lti_key, secret=secret)
-    client = oauth2.Client(consumer)
-
-    if lti_cert:
-        client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
-
     (response, content) = _post_patched_request(
+        consumers,
+        lti_key,
         body,
-        client,
         url,
         method,
         content_type,
     )
-
-    log.debug("key {}".format(lti_key))
-    log.debug("secret {}".format(secret))
-    log.debug("url {}".format(url))
-    log.debug("response {}".format(response))
-    log.debug("content {}".format(content))
 
     is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
     log.debug("is success {}".format(is_success))
@@ -239,34 +242,14 @@ def post_message2(consumers, lti_key, url, body,
     :param: body: xml body
     :return: success
     """
-    oauth_store = LTIOAuthDataStore(consumers)
-    oauth_server = oauth.OAuthServer(oauth_store)
-    oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
-    lti_consumer = oauth_store.lookup_consumer(lti_key)
-    lti_cert = oauth_store.lookup_cert(lti_key)
-
-    secret = lti_consumer.secret
-
-    consumer = oauth2.Consumer(key=lti_key, secret=secret)
-    client = oauth2.Client(consumer)
-
-    if lti_cert:
-        client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
-
     (response, content) = _post_patched_request(
+        consumers,
+        lti_key,
         body,
-        client,
         url,
         method,
         content_type,
     )
-
-    log.debug("POST MESSAGE 2")
-    log.debug("key {}".format(lti_key))
-    log.debug("secret {}".format(secret))
-    log.debug("url {}".format(url))
-    log.debug("response {}".format(response))
-    log.debug("content {}".format(content))
 
     is_success = response.status == 200
     log.debug("is success {}".format(is_success))

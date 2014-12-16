@@ -13,6 +13,7 @@ from pylti.common import (
     verify_request_common,
     LTIException,
     post_message,
+    post_message2,
     generate_request_xml
 )
 
@@ -63,14 +64,18 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
             "key1": {"secret": "secret1"},
             "key2": {"secret": "secret2"},
             "key3": {"secret": "secret3"},
-            "keyNS": {"test": "test"}
+            "keyNS": {"test": "test"},
+            "keyWCert": {"secret": "secret", "cert": "cert", "key": "key"}
         }
         store = LTIOAuthDataStore(consumers)
         self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
         self.assertEqual(store.lookup_consumer("key2").secret, "secret2")
         self.assertEqual(store.lookup_consumer("key3").secret, "secret3")
+        self.assertEqual(store.lookup_cert("keyWCert"), "cert")
         self.assertIsNone(store.lookup_consumer("key4"))
+        self.assertIsNone(store.lookup_cert("key4"))
         self.assertIsNone(store.lookup_consumer("keyNS"))
+        self.assertIsNone(store.lookup_cert("keyNS"))
 
     def test_ltioauthdatastore_no_consumers(self):
         """
@@ -79,6 +84,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         store = LTIOAuthDataStore(None)
         self.assertIsNone(store.lookup_consumer("key1"))
+        self.assertIsNone(store.lookup_cert("key1"))
 
     def test_verify_request_common(self):
         """
@@ -170,11 +176,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
         consumers = {
-            "__consumer_key__": {"secret": "__lti_secret__"}
+            "__consumer_key__": {"secret": "__lti_secret__",
+                                 "cert": "cert", "key": "key"}
         }
         body = generate_request_xml('message_identifier_id', 'operation',
                                     'lis_result_sourcedid', '1.0')
         ret = post_message(consumers, "__consumer_key__", uri, body)
+        self.assertTrue(ret)
+
+        ret = post_message2(consumers, "__consumer_key__", uri, body)
         self.assertTrue(ret)
 
     def test_generate_xml(self):

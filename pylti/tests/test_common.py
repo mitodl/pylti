@@ -6,6 +6,12 @@ import unittest
 import semantic_version
 
 import httpretty
+import oauthlib.oauth1
+try:
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    from urlparse import urlparse, parse_qs
+import urllib
 
 import pylti
 from pylti.common import (
@@ -16,14 +22,7 @@ from pylti.common import (
     post_message2,
     generate_request_xml
 )
-
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
-
-import urllib
-import oauthlib.oauth1
+from pylti.tests.util import TEST_CLIENT_CERT
 
 
 class TestCommon(unittest.TestCase):
@@ -65,7 +64,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
             "key2": {"secret": "secret2"},
             "key3": {"secret": "secret3"},
             "keyNS": {"test": "test"},
-            "keyWCert": {"secret": "secret", "cert": "cert", "key": "key"}
+            "keyWCert": {"secret": "secret", "cert": "cert"},
         }
         store = LTIOAuthDataStore(consumers)
         self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
@@ -176,8 +175,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
         consumers = {
-            "__consumer_key__": {"secret": "__lti_secret__",
-                                 "cert": "cert", "key": "key"}
+            "__consumer_key__": {
+                "secret": "__lti_secret__",
+                "cert": TEST_CLIENT_CERT,
+            },
         }
         body = generate_request_xml('message_identifier_id', 'operation',
                                     'lis_result_sourcedid', '1.0')

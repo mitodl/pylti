@@ -166,6 +166,7 @@ def _post_patched_request(consumers, lti_key, body,
 
     if lti_cert:
         client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
+        log.debug("cert {}".format(lti_cert))
 
     import httplib2
 

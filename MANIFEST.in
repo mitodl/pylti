@@ -1,1 +1,4 @@
+include LICENSE
 include README.rst
+include pytest.ini
+include requirements.txt

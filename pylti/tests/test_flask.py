@@ -272,15 +272,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                   'context_id': u'MITx/ODL_ENG/2014_T1',
                   'lti_version': u'LTI-1p0',
                   'launch_presentation_return_url': u'',
-                  'lis_outcome_service_url': (lit_outcome_service_url
-                                              or u'https://example.edu/'
-                                                 u'courses/MITx/ODL_ENG/'
-                                                 u'2014_T1/xblock/i4x:;_;'
-                                                 u'_MITx;_ODL_ENG;_lti;'
-                                                 u'_94173d3e79d145fd8ec2e'
-                                                 u'83f15836ac8'
-                                                 u'/handler_noauth/'
-                                                 u'grade_handler'),
+                  'lis_outcome_service_url': (lit_outcome_service_url or
+                                              u'https://example.edu/'
+                                              u'courses/MITx/ODL_ENG/'
+                                              u'2014_T1/xblock/i4x:;_;'
+                                              u'_MITx;_ODL_ENG;_lti;'
+                                              u'_94173d3e79d145fd8ec2e'
+                                              u'83f15836ac8'
+                                              u'/handler_noauth/'
+                                              u'grade_handler'),
                   'lti_message_type': u'basic-lti-launch-request',
                   }
         if add_params is not None:

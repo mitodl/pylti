@@ -42,6 +42,23 @@ def unknown_protection(lti):
     return "hi"  # pragma: no cover
 
 
+@app.route("/no_app")
+@lti(error=error)
+def no_app(lti):
+    """
+    use decorator without specifying LTI, raise exception
+
+    :param lti: `lti` object
+    """
+    # Check that we have the app in our lti object and raise if we
+    # don't
+    if not lti.lti_kwargs['app']:  # pragma: no cover
+        raise Exception(
+            'The app is null and is not properly getting current_app'
+        )
+    return 'hi'
+
+
 @app.route("/any")
 @lti(error=error, request='any', app=app)
 def any_route(lti):

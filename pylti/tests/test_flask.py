@@ -7,9 +7,11 @@ import unittest
 import urllib
 
 import httpretty
+import mock
 import oauthlib.oauth1
 
 from pylti.common import LTIException
+from pylti.flask import LTI
 from pylti.tests.test_flask_app import app_exception, app
 
 
@@ -479,3 +481,12 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         ret = self.app.get("/post_grade2/1.0")
         self.assertTrue(self.has_exception())
         self.assertEqual(ret.data, "error")
+
+    @mock.patch.object(LTI, '_check_role')
+    @mock.patch.object(LTI, 'verify')
+    def test_decorator_no_app(self, mock_verify, _):
+        """Verify the decorator doesn't require the app object."""
+        mock_verify.return_value = True
+        response = self.app.get('/no_app')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('hi', response.data)

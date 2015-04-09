@@ -7,7 +7,7 @@ from functools import wraps, partial
 import logging
 import json
 
-from flask import session
+from flask import session, current_app
 from flask import request as flask_request
 
 from .common import (
@@ -21,7 +21,8 @@ from .common import (
     LTIException,
     LTIRoleException,
     LTINotInSessionException,
-    LTIPostMessageException)
+    LTIPostMessageException
+)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
@@ -40,6 +41,10 @@ class LTI(object):
         self.lti_args = lti_args
         self.lti_kwargs = lti_kwargs
         self.nickname = self.name
+
+        # Set app to current_app if not specified
+        if not self.lti_kwargs['app']:
+            self.lti_kwargs['app'] = current_app
 
     @property
     def name(self):
@@ -312,7 +317,8 @@ def lti(app=None, request=None, error=None, role='any',
     """
     LTI decorator
 
-    :param: app - Flask App object (required)
+    :param: app - Flask App object (optional).
+        :py:attr:`flask.current_app` is used if no object is passed in.
     :param: error - Callback if LTI throws exception (required)
     :param: request - Request type (default: any)
     :param: roles - LTI Role (default: any)

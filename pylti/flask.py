@@ -53,7 +53,7 @@ class LTI(object):
             self.lti_kwargs['app'] = current_app
 
     @property
-    def name(self):
+    def name(self):  # pylint: disable=no-self-use
         """
         Name returns user's name or user's email or user_id
         :return: best guess of name to use to greet user
@@ -68,7 +68,7 @@ class LTI(object):
             return ''
 
     @property
-    def user_id(self):
+    def user_id(self):  # pylint: disable=no-self-use
         """
         Returns user_id as provided by LTI
 
@@ -83,7 +83,7 @@ class LTI(object):
 
         :raises: LTIException
         """
-        log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
+        log.debug('verify request=%s', self.lti_kwargs.get('request'))
         if self.lti_kwargs.get('request') == 'session':
             self._verify_session()
         elif self.lti_kwargs.get('request') == 'initial':
@@ -106,7 +106,8 @@ class LTI(object):
         except LTINotInSessionException:
             self.verify_request()
 
-    def _verify_session(self):
+    @staticmethod
+    def _verify_session():
         """
         Verify that session was already created
 
@@ -127,14 +128,15 @@ class LTI(object):
         return consumers
 
     @property
-    def key(self):
+    def key(self):  # pylint: disable=no-self-use
         """
         OAuth Consumer Key
         :return: key
         """
         return session['oauth_consumer_key']
 
-    def message_identifier_id(self):
+    @staticmethod
+    def message_identifier_id():
         """
         Message identifier to use for XML callback
 
@@ -143,7 +145,7 @@ class LTI(object):
         return "edX_fix"
 
     @property
-    def lis_result_sourcedid(self):
+    def lis_result_sourcedid(self):  # pylint: disable=no-self-use
         """
         lis_result_sourcedid to use for XML callback
 
@@ -152,7 +154,7 @@ class LTI(object):
         return session['lis_result_sourcedid']
 
     @property
-    def role(self):
+    def role(self):  # pylint: disable=no-self-use
         """
         LTI roles
 
@@ -160,7 +162,8 @@ class LTI(object):
         """
         return session['roles']
 
-    def is_role(self, role):
+    @staticmethod
+    def is_role(role):
         """
         Verify if user is in role
 
@@ -168,15 +171,17 @@ class LTI(object):
         :return: if user is in role
         :exception: LTIException if role is unknown
         """
-        log.debug("is_role {}".format(role))
+        log.debug("is_role %s", role)
         roles = session['roles'].split(',')
         if role in LTI_ROLES:
             role_list = LTI_ROLES[role]
             # find the intersection of the roles
             roles = set(role_list) & set(roles)
             is_user_role_there = len(roles) >= 1
-            log.debug("is_role roles_list={} role={} in list={}"
-                      .format(role_list, roles, is_user_role_there))
+            log.debug(
+                "is_role roles_list=%s role=%s in list=%s", role_list,
+                roles, is_user_role_there
+            )
             return is_user_role_there
         else:
             raise LTIException("Unknown role {}.".format(role))
@@ -190,8 +195,9 @@ class LTI(object):
         role = u'any'
         if 'role' in self.lti_kwargs:
             role = self.lti_kwargs['role']
-        log.debug("check_role lti_role={} decorator_role={}"
-                  .format(self.role, role))
+        log.debug(
+            "check_role lti_role=%s decorator_role=%s", self.role, role
+        )
         if not self.is_role(role):
             raise LTIRoleException('Not authorized.')
 
@@ -237,8 +243,7 @@ class LTI(object):
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
-                    log.debug("params {}={}".format(prop,
-                                                    params.get(prop, None)))
+                    log.debug("params %s=%s", prop, params.get(prop, None))
                     session[prop] = params[prop]
 
             # Set logged in session key
@@ -311,7 +316,8 @@ class LTI(object):
 
         return False
 
-    def close_session(self):
+    @staticmethod
+    def close_session():
         """
         Invalidates session
         """
@@ -346,10 +352,13 @@ def lti(app=None, request='any', error=default_error, role='any',
 
         @wraps(function)
         def wrapper(*args, **kwargs):
+            """
+            Pass LTI reference to function or return error.
+            """
             try:
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
-                the_lti._check_role()
+                the_lti._check_role()  # pylint: disable=protected-access
                 kwargs['lti'] = the_lti
                 return function(*args, **kwargs)
             except LTIException as lti_exception:

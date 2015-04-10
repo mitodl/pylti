@@ -17,15 +17,14 @@ from pylti.tests.test_flask_app import app_exception, app
 
 class TestFlask(unittest.TestCase):
     """
-    Consumers
+    Consumers.
     """
+    # pylint: disable=too-many-public-methods
     consumers = {
         "__consumer_key__": {"secret": "__lti_secret__"}
     }
 
-    """
-    Valid XML response from LTI 1.0 consumer
-    """
+    # Valid XML response from LTI 1.0 consumer
     expected_response = """<?xml version="1.0" encoding="UTF-8"?>
 <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1\
 /xsd/imsoms_v1p0">
@@ -50,7 +49,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def setUp(self):
         """
-        Setting up app config
+        Setting up app config.
         """
         app.config['TESTING'] = True
         app.config['SERVER_NAME'] = 'localhost'
@@ -65,30 +64,33 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app = app.test_client()
         app_exception.reset()
 
-    def get_exception(self):
+    @staticmethod
+    def get_exception():
         """
-        Returns exception raised by PyLTI
+        Returns exception raised by PyLTI.
         :return: exception
         """
         return app_exception.get()
 
-    def has_exception(self):
+    @staticmethod
+    def has_exception():
         """
-        Check if PyLTI raised exception
+        Check if PyLTI raised exception.
         :return: is exception raised
         """
         return app_exception.get() is not None
 
-    def get_exception_as_string(self):
+    @staticmethod
+    def get_exception_as_string():
         """
-        Return text of the exception raised by LTI
+        Return text of the exception raised by LTI.
         :return: text
         """
-        return "{}".format(self.get_exception())
+        return "{}".format(TestFlask.get_exception())
 
     def test_access_to_oauth_resource_unknown_protection(self):
         """
-        Invalid LTI request scope
+        Invalid LTI request scope.
         """
         self.app.get('/unknown_protection')
         self.assertTrue(self.has_exception())
@@ -98,7 +100,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_without_authorization_any(self):
         """
-        Accessing LTI without establishing session
+        Accessing LTI without establishing session.
         """
         self.app.get('/any')
         self.assertTrue(self.has_exception())
@@ -108,7 +110,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_without_authorization_session(self):
         """
-        Accessing LTI session scope before session established
+        Accessing LTI session scope before session established.
         """
         self.app.get('/session')
         self.assertTrue(self.has_exception())
@@ -118,7 +120,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_without_authorization_initial_get(self):
         """
-        Accessing LTI without basic-lti-launch-request parameters as GET
+        Accessing LTI without basic-lti-launch-request parameters as GET.
         """
         self.app.get('/initial')
         self.assertTrue(self.has_exception())
@@ -128,7 +130,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_without_authorization_initial_post(self):
         """
-        Accessing LTI without basic-lti-launch-request parameters as POST
+        Accessing LTI without basic-lti-launch-request parameters as POST.
         """
         self.app.post('/initial')
         self.assertTrue(self.has_exception())
@@ -138,7 +140,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_in_session(self):
         """
-        Accessing LTI after session established
+        Accessing LTI after session established.
         """
         self.app.get('/setup_session')
 
@@ -147,7 +149,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_in_session_with_close(self):
         """
-        Accessing LTI after session closed
+        Accessing LTI after session closed.
         """
         self.app.get('/setup_session')
 
@@ -163,7 +165,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource(self):
         """
-        Accessing oauth_resource
+        Accessing oauth_resource.
         """
         consumers = self.consumers
         url = 'http://localhost/initial?'
@@ -174,13 +176,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_name_passed(self):
         """
-        Check that name is returned if passed via initial request
+        Check that name is returned if passed via initial request.
         """
+        # pylint: disable=maybe-no-member
         consumers = self.consumers
         url = 'http://localhost/name?'
         add_params = {u'lis_person_sourcedid': u'person'}
-        new_url = self.generate_launch_request(consumers, url,
-                                               add_params=add_params)
+        new_url = self.generate_launch_request(
+            consumers, url, add_params=add_params
+        )
 
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
@@ -188,13 +192,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_email_passed(self):
         """
-        Check that email is returned if passed via initial request
+        Check that email is returned if passed via initial request.
         """
+        # pylint: disable=maybe-no-member
         consumers = self.consumers
         url = 'http://localhost/name?'
         add_params = {u'lis_person_contact_email_primary': u'email@email.com'}
-        new_url = self.generate_launch_request(consumers, url,
-                                               add_params=add_params)
+        new_url = self.generate_launch_request(
+            consumers, url, add_params=add_params
+        )
 
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
@@ -202,14 +208,16 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_name_and_email_passed(self):
         """
-        Check that name is returned if both email and name passed
+        Check that name is returned if both email and name passed.
         """
+        # pylint: disable=maybe-no-member
         consumers = self.consumers
         url = 'http://localhost/name?'
         add_params = {u'lis_person_sourcedid': u'person',
                       u'lis_person_contact_email_primary': u'email@email.com'}
-        new_url = self.generate_launch_request(consumers, url,
-                                               add_params=add_params)
+        new_url = self.generate_launch_request(
+            consumers, url, add_params=add_params
+        )
 
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
@@ -217,52 +225,57 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_staff_only_as_student(self):
         """
-        Deny access if user not in role
+        Deny access if user not in role.
         """
         consumers = self.consumers
         url = 'http://localhost/initial_staff?'
-        new_url = self.generate_launch_request(consumers, url,
-                                               roles='Student')
+        new_url = self.generate_launch_request(
+            consumers, url, roles='Student'
+        )
 
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource_staff_only_as_administrator(self):
         """
-        Allow access if user in role
+        Allow access if user in role.
         """
         consumers = self.consumers
         url = 'http://localhost/initial_staff?'
-        new_url = self.generate_launch_request(consumers, url,
-                                               roles='Administrator')
+        new_url = self.generate_launch_request(
+            consumers, url, roles='Administrator'
+        )
 
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
     def test_access_to_oauth_resource_staff_only_as_unknown_role(self):
         """
-        Deny access if role not defined
+        Deny access if role not defined.
         """
         consumers = self.consumers
         url = 'http://localhost/initial_unknown?'
-        new_url = self.generate_launch_request(consumers, url,
-                                               roles='Administrator')
+        new_url = self.generate_launch_request(
+            consumers, url, roles='Administrator'
+        )
 
         self.app.get(new_url)
         self.assertTrue(self.has_exception())
 
-    def generate_launch_request(self, consumers, url,
+    @staticmethod
+    def generate_launch_request(consumers, url,
                                 lit_outcome_service_url=None,
                                 roles=u'Instructor',
                                 add_params=None):
         """
-        Generate valid basic-lti-launch-request request with options
+        Generate valid basic-lti-launch-request request with options.
         :param consumers: consumer map
         :param url: URL to sign
         :param lit_outcome_service_url: LTI callback
         :param roles: LTI role
         :return: signed request
         """
+        # pylint: disable=unused-argument, too-many-arguments
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-'
                                       u'94173d3e79d145fd8ec2e83f15836ac8',
                   'user_id': u'008437924c9852377e8994829aaac7a1',
@@ -283,8 +296,8 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                               u'83f15836ac8'
                                               u'/handler_noauth/'
                                               u'grade_handler'),
-                  'lti_message_type': u'basic-lti-launch-request',
-                  }
+                  'lti_message_type': u'basic-lti-launch-request'}
+
         if add_params is not None:
             params.update(add_params)
 
@@ -303,7 +316,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_any(self):
         """
-        Test access to LTI protected resources
+        Test access to LTI protected resources.
         """
         url = 'http://localhost/any?'
         new_url = self.generate_launch_request(self.consumers, url)
@@ -313,7 +326,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_invalid(self):
         """
         Deny access to LTI protected resources
-        on man in the middle attack
+        on man in the middle attack.
         """
         url = 'http://localhost/initial?'
         new_url = self.generate_launch_request(self.consumers, url)
@@ -326,7 +339,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
     def test_access_to_oauth_resource_invalid_after_session_setup(self):
         """
-        Remove browser session on man in the middle attach
+        Remove browser session on man in the middle attach.
         """
         self.app.get('/setup_session')
         self.app.get('/session')
@@ -344,17 +357,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     @httpretty.activate
     def test_access_to_oauth_resource_post_grade(self):
         """
-        Check post_grade functionality
+        Check post_grade functionality.
         """
+        # pylint: disable=maybe-no-member
         uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
 
-        def request_callback(request, cburi, headers):
-            return 200, headers, self.expected_response
-
-        httpretty.register_uri(httpretty.POST, uri, body=request_callback)
+        httpretty.register_uri(httpretty.POST, uri, body=self.request_callback)
 
         consumers = self.consumers
         url = 'http://localhost/initial?'
@@ -374,14 +385,19 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     @httpretty.activate
     def test_access_to_oauth_resource_post_grade_fail(self):
         """
-        Check post_grade functionality fails on invalid response
+        Check post_grade functionality fails on invalid response.
         """
+        # pylint: disable=maybe-no-member
         uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/grade_handler')
 
         def request_callback(request, cburi, headers):
+            # pylint: disable=unused-argument
+            """
+            Mock error response callback.
+            """
             return 200, headers, "wrong_response"
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
@@ -391,6 +407,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
+        self.assertFalse(self.has_exception())
 
         ret = self.app.get("/post_grade/1.0")
         self.assertTrue(self.has_exception())
@@ -399,18 +416,17 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     @httpretty.activate
     def test_access_to_oauth_resource_post_grade_fix_url(self):
         """
-        Make sure URL remap works for edX vagrant stack
+        Make sure URL remap works for edX vagrant stack.
         """
+        # pylint: disable=maybe-no-member
         uri = 'https://localhost:8000/dev_stack'
 
-        def request_callback(request, cburi, headers):
-            return 200, headers, self.expected_response
-
-        httpretty.register_uri(httpretty.POST, uri, body=request_callback)
+        httpretty.register_uri(httpretty.POST, uri, body=self.request_callback)
 
         url = 'http://localhost/initial?'
-        new_url = self.generate_launch_request(self.consumers, url,
-                                               lit_outcome_service_url=uri)
+        new_url = self.generate_launch_request(
+            self.consumers, url, lit_outcome_service_url=uri
+        )
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
@@ -425,19 +441,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     @httpretty.activate
     def test_access_to_oauth_resource_post_grade2(self):
         """
-        Check post_grade edX LTI2 functionality
+        Check post_grade edX LTI2 functionality.
         """
-
         uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
                u'/lti_2_0_result_rest_handler/user/'
                u'008437924c9852377e8994829aaac7a1')
 
-        def request_callback(request, cburi, headers):
-            return 200, headers, self.expected_response
-
-        httpretty.register_uri(httpretty.PUT, uri, body=request_callback)
+        httpretty.register_uri(httpretty.PUT, uri, body=self.request_callback)
 
         consumers = self.consumers
         url = 'http://localhost/initial?'
@@ -454,12 +466,18 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertFalse(self.has_exception())
         self.assertEqual(ret.data, "grade=False")
 
+    def request_callback(self, request, cburi, headers):
+        # pylint: disable=unused-argument
+        """
+        Mock expected response.
+        """
+        return 200, headers, self.expected_response
+
     @httpretty.activate
     def test_access_to_oauth_resource_post_grade2_fail(self):
         """
         Check post_grade edX LTI2 functionality
         """
-
         uri = (u'https://example.edu/courses/MITx/ODL_ENG/2014_T1/xblock/'
                u'i4x:;_;_MITx;_ODL_ENG;_lti;'
                u'_94173d3e79d145fd8ec2e83f15836ac8/handler_noauth'
@@ -467,6 +485,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                u'008437924c9852377e8994829aaac7a1')
 
         def request_callback(request, cburi, headers):
+            # pylint: disable=unused-argument
+            """
+            Mock expected response.
+            """
             return 400, headers, self.expected_response
 
         httpretty.register_uri(httpretty.PUT, uri, body=request_callback)
@@ -486,6 +508,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     @mock.patch.object(LTI, 'verify')
     def test_decorator_no_app(self, mock_verify, _):
         """Verify the decorator doesn't require the app object."""
+        # pylint: disable=maybe-no-member
         mock_verify.return_value = True
         response = self.app.get('/no_app')
         self.assertEqual(200, response.status_code)
@@ -506,6 +529,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         # Validate we get our error page when there is a bad LTI
         # request
+        # pylint: disable=maybe-no-member
         response = self.app.get('/default_lti')
         self.assertEqual(500, response.status_code)
         self.assertEqual("There was an LTI communication error", response.data)

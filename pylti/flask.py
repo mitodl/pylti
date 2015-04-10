@@ -155,20 +155,23 @@ class LTI(object):
         return session['roles']
 
     def is_role(self, role):
-        """
+        """ 
         Verify if user is in role
 
         :param: role: role to verify against
         :return: if user is in role
         :exception: LTIException if role is unknown
-        """
+        """ 
         log.debug("is_role {}".format(role))
-        roles = session['roles']
+        roles = session['roles'].split(',')
         if role in LTI_ROLES:
             list = LTI_ROLES[role]
+            # find the intersection of the roles
+            roles = set(LTI_ROLES[role]) & set(roles)
+            is_user_role_there = len(roles) >= 1
             log.debug("is_role roles_list={} role={} in list={}"
-                      .format(list, roles, roles in list))
-            return roles in list
+                      .format(list, roles, is_user_role_there))
+            return is_user_role_there
         else:
             raise LTIException("Unknown role {}.".format(role))
 

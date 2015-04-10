@@ -155,7 +155,7 @@ class LTI(object):
         return session['roles']
 
     def is_role(self, role):
-        """ 
+        """
         Verify if user is in role
 
         :param: role: role to verify against

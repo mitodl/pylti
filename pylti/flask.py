@@ -161,7 +161,7 @@ class LTI(object):
         :param: role: role to verify against
         :return: if user is in role
         :exception: LTIException if role is unknown
-        """ 
+        """
         log.debug("is_role {}".format(role))
         roles = session['roles'].split(',')
         if role in LTI_ROLES:

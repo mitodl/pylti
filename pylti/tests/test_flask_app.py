@@ -31,7 +31,7 @@ def error(exception):
 
 
 @app.route("/unknown_protection")
-@lti(error=error, app=app)
+@lti(error=error, app=app, request='notreal')
 def unknown_protection(lti):
     """
     access route with unknown protection
@@ -181,3 +181,12 @@ def post_grade2(grade, lti):
     """
     ret = lti.post_grade2(grade)
     return "grade={}".format(ret)
+
+
+@app.route("/default_lti")
+@lti
+def default_lti(lti=lti):
+    """
+    Make sure default LTI decorator works.
+    """
+    return 'hi'  # pragma: no cover

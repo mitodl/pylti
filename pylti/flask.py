@@ -3,11 +3,11 @@
     PyLTI decorator implementation for flask framework
 """
 from __future__ import absolute_import
-from functools import wraps, partial
+from functools import wraps
 import logging
 import json
 
-from flask import session, current_app
+from flask import session, current_app, Flask
 from flask import request as flask_request
 
 from .common import (
@@ -26,6 +26,12 @@ from .common import (
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
+
+
+def default_error(exception=None):
+    """Render simple error page.  This should be overidden in applications."""
+    # pylint: disable=unused-argument
+    return "There was an LTI communication error", 500
 
 
 class LTI(object):
@@ -312,26 +318,26 @@ class LTI(object):
         session[LTI_SESSION_KEY] = False
 
 
-def lti(app=None, request=None, error=None, role='any',
-        *lti_args_out, **lti_kwargs_out):
+def lti(app=None, request='any', error=default_error, role='any',
+        *lti_args, **lti_kwargs):
     """
     LTI decorator
 
     :param: app - Flask App object (optional).
         :py:attr:`flask.current_app` is used if no object is passed in.
-    :param: error - Callback if LTI throws exception (required)
-    :param: request - Request type (default: any)
+    :param: error - Callback if LTI throws exception (optional).
+        :py:attr:`pylti.flask.default_error` is the default.
+    :param: request - Request type from
+        :py:attr:`pylti.common.LTI_REQUEST_TYPE`. (default: any)
     :param: roles - LTI Role (default: any)
     :return: wrapper
     """
 
-    def _lti(function, lti_args=None, lti_kwargs=None):
+    def _lti(function):
         """
         Inner LTI decorator
 
         :param: function:
-        :param: lti_args:
-        :param: lti_kwargs:
         :return:
         """
 
@@ -352,11 +358,15 @@ def lti(app=None, request=None, error=None, role='any',
                 return error(exception=exception)
 
         return wrapper
-    lti_kwargs_out['app'] = app
-    lti_kwargs_out['request'] = request
-    lti_kwargs_out['error'] = error
-    lti_kwargs_out['role'] = role
 
-    ret = partial(_lti, lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
+    lti_kwargs['request'] = request
+    lti_kwargs['error'] = error
+    lti_kwargs['role'] = role
 
-    return ret
+    if (not app) or isinstance(app, Flask):
+        lti_kwargs['app'] = app
+        return _lti
+    else:
+        # We are wrapping without arguments
+        lti_kwargs['app'] = None
+        return _lti(app)

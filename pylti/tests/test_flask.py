@@ -490,3 +490,22 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         response = self.app.get('/no_app')
         self.assertEqual(200, response.status_code)
         self.assertEqual('hi', response.data)
+
+    def test_default_decorator(self):
+        """
+        Verify default decorator works.
+        """
+        url = 'http://localhost/default_lti?'
+        new_url = self.generate_launch_request(self.consumers, url)
+        self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+    def test_default_decorator_bad(self):
+        """
+        Verify error handling works.
+        """
+        # Validate we get our error page when there is a bad LTI
+        # request
+        response = self.app.get('/default_lti')
+        self.assertEqual(500, response.status_code)
+        self.assertEqual("There was an LTI communication error", response.data)

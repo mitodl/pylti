@@ -1,0 +1,12 @@
+[MESSAGES CONTROL]
+
+disable =
+	locally-disabled,
+	duplicate-code
+
+[BASIC]
+
+function-rgx=[a-z_][a-z0-9_]{2,60}$
+
+# Regular expression which should only match correct method names
+method-rgx=[a-z_][a-z0-9_]{2,70}$

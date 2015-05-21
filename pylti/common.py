@@ -39,8 +39,8 @@ LTI_ROLES = {
     u'staff': [u'Administrator', u'Instructor', ],
     u'instructor': [u'Instructor', ],
     u'administrator': [u'Administrator', ],
-    u'student': [u'Student', ],
-    u'any': [u'Administrator', u'Instructor', u'Student', ],
+    u'student': [u'Student', u'Learner', ],
+    u'any': [u'Administrator', u'Instructor', u'Student', u'Learner',],
 }
 
 LTI_SESSION_KEY = u'lti_authenticated'

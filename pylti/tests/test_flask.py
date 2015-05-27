@@ -232,8 +232,13 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(
             consumers, url, roles='Student'
         )
+        coursera_url = self.generate_launch_request(
+            consumers, url, roles='Learner'
+        )
 
         self.app.get(new_url)
+        self.assertTrue(self.has_exception())
+        self.app.get(coursera_url)
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource_staff_only_as_administrator(self):

@@ -52,7 +52,7 @@ def error(exception):
 def unknown_protection(lti):
     # pylint: disable=unused-argument,
     """
-    access route with unknown protection
+    Access route with unknown protection.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -65,7 +65,7 @@ def unknown_protection(lti):
 def no_app(lti):
     # pylint: disable=unused-argument,
     """
-    use decorator without specifying LTI, raise exception
+    Use decorator without specifying LTI, raise exception.
 
     :param lti: `lti` object
     """
@@ -83,7 +83,7 @@ def no_app(lti):
 def any_route(lti):
     # pylint: disable=unused-argument,
     """
-    access route with 'any' request
+    Access route with 'any' request.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -96,7 +96,7 @@ def any_route(lti):
 def session_route(lti):
     # pylint: disable=unused-argument,
     """
-    access route with 'session' request
+    Access route with 'session' request.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -109,7 +109,7 @@ def session_route(lti):
 def initial_route(lti):
     # pylint: disable=unused-argument,
     """
-    access route with 'initial' request
+    Access route with 'initial' request.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -121,7 +121,7 @@ def initial_route(lti):
 @lti_flask(error=error, request='initial', app=app)
 def name(lti):
     """
-    access route with 'initial' request
+    Access route with 'initial' request.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -134,7 +134,20 @@ def name(lti):
 def initial_staff_route(lti):
     # pylint: disable=unused-argument,
     """
-    access route with 'initial' request and 'staff' role
+    Access route with 'initial' request and 'staff' role.
+
+    :param lti: `lti` object
+    :return: string "hi"
+    """
+    return "hi"
+
+
+@app.route("/initial_student", methods=['GET', 'POST'])
+@lti_flask(error=error, request='initial', role='student', app=app)
+def initial_student_route(lti):
+    # pylint: disable=unused-argument,
+    """
+    Access route with 'initial' request and 'student' role.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -147,7 +160,7 @@ def initial_staff_route(lti):
 def initial_unknown_route(lti):
     # pylint: disable=unused-argument,
     """
-    access route with 'initial' request and 'unknown' role
+    Access route with 'initial' request and 'unknown' role.
 
     :param lti: `lti` object
     :return: string "hi"
@@ -158,7 +171,7 @@ def initial_unknown_route(lti):
 @app.route("/setup_session")
 def setup_session():
     """
-    access 'setup_session' route with 'Student' role and oauth_consumer_key
+    Access 'setup_session' route with 'Student' role and oauth_consumer_key.
 
     :return: string "session set"
     """
@@ -172,7 +185,7 @@ def setup_session():
 @lti_flask(error=error, request='session', app=app)
 def logout_route(lti):
     """
-    access 'close_session' route
+    Access 'close_session' route.
 
     :param lti: `lti` object
     :return: string "session closed"
@@ -185,7 +198,7 @@ def logout_route(lti):
 @lti_flask(error=error, request='session', app=app)
 def post_grade(grade, lti):
     """
-    access route with 'session' request
+    Access route with 'session' request.
 
     :param lti: `lti` object
     :return: string "grade={}"
@@ -198,7 +211,7 @@ def post_grade(grade, lti):
 @lti_flask(error=error, request='session', app=app)
 def post_grade2(grade, lti):
     """
-    access route with 'session' request
+    Access route with 'session' request.
 
     :param lti: `lti` object
     :return: string "grade={}"

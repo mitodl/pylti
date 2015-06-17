@@ -229,16 +229,16 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         consumers = self.consumers
         url = 'http://localhost/initial_staff?'
-        new_url = self.generate_launch_request(
+        student_url = self.generate_launch_request(
             consumers, url, roles='Student'
         )
-        coursera_url = self.generate_launch_request(
+        self.app.get(student_url)
+        self.assertTrue(self.has_exception())
+
+        learner_url = self.generate_launch_request(
             consumers, url, roles='Learner'
         )
-
-        self.app.get(new_url)
-        self.assertTrue(self.has_exception())
-        self.app.get(coursera_url)
+        self.app.get(learner_url)
         self.assertTrue(self.has_exception())
 
     def test_access_to_oauth_resource_staff_only_as_administrator(self):
@@ -260,11 +260,51 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         consumers = self.consumers
         url = 'http://localhost/initial_unknown?'
-        new_url = self.generate_launch_request(
+        admin_url = self.generate_launch_request(
             consumers, url, roles='Administrator'
         )
 
-        self.app.get(new_url)
+        self.app.get(admin_url)
+        self.assertTrue(self.has_exception())
+
+    def test_access_to_oauth_resource_student_as_student(self):
+        """
+        Verify that the various roles we consider as students are students.
+        """
+        consumers = self.consumers
+        url = 'http://localhost/initial_student?'
+
+        # Learner Role
+        learner_url = self.generate_launch_request(
+            consumers, url, roles='Learner'
+        )
+        self.app.get(learner_url)
+        self.assertFalse(self.has_exception())
+
+        student_url = self.generate_launch_request(
+            consumers, url, roles='Student'
+        )
+        self.app.get(student_url)
+        self.assertFalse(self.has_exception())
+
+    def test_access_to_oauth_resource_student_as_staff(self):
+        """Verify staff doesn't have access to student only."""
+        consumers = self.consumers
+        url = 'http://localhost/initial_unknown?'
+        staff_url = self.generate_launch_request(
+            consumers, url, roles='Staff'
+        )
+        self.app.get(staff_url)
+        self.assertTrue(self.has_exception())
+
+    def test_access_to_oauth_resource_student_as_unknown(self):
+        """Verify staff doesn't have access to student only."""
+        consumers = self.consumers
+        url = 'http://localhost/initial_unknown?'
+        unknown_url = self.generate_launch_request(
+            consumers, url, roles='FooBar'
+        )
+        self.app.get(unknown_url)
         self.assertTrue(self.has_exception())
 
     @staticmethod

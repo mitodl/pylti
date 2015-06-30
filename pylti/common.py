@@ -285,7 +285,7 @@ def verify_request_common(consumers, url, method, headers, params):
 
     # Check header for SSL before selecting the url
     if headers.get('X-Forwarded-Proto', 'http') == 'https':
-        url = url.replace('http', 'https', 1)
+        url = url.replace('http:', 'https:', 1)
 
     oauth_request = oauth.OAuthRequest.from_request(
         method,

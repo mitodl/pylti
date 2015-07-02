@@ -110,6 +110,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers, method, url, verify_params, _ = (
             self.generate_oauth_request(url_to_sign=orig_url)
         )
+
         ret = verify_request_common(consumers, url, method,
                                     headers, verify_params)
         self.assertTrue(ret)
@@ -227,7 +228,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
-        url = 'http://localhost:5000/?'
+        url = url_to_sign or 'http://localhost:5000/?'
         method = 'GET'
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-'
                                       u'lti-94173d3e79d145fd8ec2e83f15836ac8',
@@ -255,7 +256,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
                                         SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.
                                         SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(url_to_sign or url, urlparams))
+        signature = client.sign("{}{}".format(url, urlparams))
 
         url_parts = urlparse(signature[0])
         query_string = parse_qs(url_parts.query, keep_blank_values=True)

@@ -160,7 +160,7 @@ class LTI(object):
 
         :return: roles
         """
-        return session['roles']
+        return session.get('roles')
 
     @staticmethod
     def is_role(role):

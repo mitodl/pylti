@@ -35,12 +35,13 @@ LTI_PROPERTY_LIST = [
     'lis_outcome_service_url'
 ]
 
+
 LTI_ROLES = {
     u'staff': [u'Administrator', u'Instructor', ],
     u'instructor': [u'Instructor', ],
     u'administrator': [u'Administrator', ],
-    u'student': [u'Student', u'Learner', ],
-    u'any': [u'Administrator', u'Instructor', u'Student', u'Learner', ],
+    u'student': [u'Student', u'Learner', ]
+    # There is also a special role u'any' that ignores role check
 }
 
 LTI_SESSION_KEY = u'lti_authenticated'

@@ -324,7 +324,6 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-lti-'
                                       u'94173d3e79d145fd8ec2e83f15836ac8',
                   'user_id': u'008437924c9852377e8994829aaac7a1',
-                  'roles': roles,
                   'lis_result_sourcedid': u'MITx/ODL_ENG/2014_T1:'
                                           u'edge.edx.org-i4x-MITx-ODL_ENG-lti-'
                                           u'94173d3e79d145fd8ec2e83f15836ac8:'
@@ -342,6 +341,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                               u'/handler_noauth/'
                                               u'grade_handler'),
                   'lti_message_type': u'basic-lti-launch-request'}
+
+        if roles is not None:
+            params['roles'] = roles
 
         if add_params is not None:
             params.update(add_params)
@@ -365,6 +367,25 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         url = 'http://localhost/any?'
         new_url = self.generate_launch_request(self.consumers, url)
+        self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+    def test_access_to_oauth_resource_any_norole(self):
+        """
+        Test access to LTI protected resources.
+        """
+        url = 'http://localhost/any?'
+        new_url = self.generate_launch_request(self.consumers, url, roles=None)
+        self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
+    def test_access_to_oauth_resource_any_nonstandard_role(self):
+        """
+        Test access to LTI protected resources.
+        """
+        url = 'http://localhost/any?'
+        new_url = self.generate_launch_request(self.consumers, url,
+                                               roles=u'ThisIsNotAStandardRole')
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 

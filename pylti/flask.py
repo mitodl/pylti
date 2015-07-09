@@ -160,7 +160,7 @@ class LTI(object):
 
         :return: roles
         """
-        return session['roles']
+        return session.get('roles')
 
     @staticmethod
     def is_role(role):
@@ -198,7 +198,7 @@ class LTI(object):
         log.debug(
             "check_role lti_role=%s decorator_role=%s", self.role, role
         )
-        if not self.is_role(role):
+        if not (role == u'any' or self.is_role(role)):
             raise LTIRoleException('Not authorized.')
 
     @property

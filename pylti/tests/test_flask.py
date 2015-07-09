@@ -343,7 +343,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                   'lti_message_type': u'basic-lti-launch-request'}
 
         if roles is not None:
-          params['roles'] = roles
+            params['roles'] = roles
 
         if add_params is not None:
             params.update(add_params)
@@ -379,16 +379,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
-
     def test_access_to_oauth_resource_any_nonstandard_role(self):
         """
         Test access to LTI protected resources.
         """
         url = 'http://localhost/any?'
-        new_url = self.generate_launch_request(self.consumers, url, roles=u'ThisIsNotAStandardRole')
+        new_url = self.generate_launch_request(self.consumers, url,
+                                               roles=u'ThisIsNotAStandardRole')
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
-
 
     def test_access_to_oauth_resource_invalid(self):
         """

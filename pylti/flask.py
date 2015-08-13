@@ -3,11 +3,11 @@
     PyLTI decorator implementation for flask framework
 """
 from __future__ import absolute_import
-from functools import wraps, partial
+from functools import wraps
 import logging
 import json
 
-from flask import session
+from flask import session, current_app, Flask
 from flask import request as flask_request
 
 from .common import (
@@ -21,10 +21,17 @@ from .common import (
     LTIException,
     LTIRoleException,
     LTINotInSessionException,
-    LTIPostMessageException)
+    LTIPostMessageException
+)
 
 
 log = logging.getLogger('pylti.flask')  # pylint: disable=invalid-name
+
+
+def default_error(exception=None):
+    """Render simple error page.  This should be overidden in applications."""
+    # pylint: disable=unused-argument
+    return "There was an LTI communication error", 500
 
 
 class LTI(object):
@@ -41,8 +48,12 @@ class LTI(object):
         self.lti_kwargs = lti_kwargs
         self.nickname = self.name
 
+        # Set app to current_app if not specified
+        if not self.lti_kwargs['app']:
+            self.lti_kwargs['app'] = current_app
+
     @property
-    def name(self):
+    def name(self):  # pylint: disable=no-self-use
         """
         Name returns user's name or user's email or user_id
         :return: best guess of name to use to greet user
@@ -57,7 +68,7 @@ class LTI(object):
             return ''
 
     @property
-    def user_id(self):
+    def user_id(self):  # pylint: disable=no-self-use
         """
         Returns user_id as provided by LTI
 
@@ -72,7 +83,7 @@ class LTI(object):
 
         :raises: LTIException
         """
-        log.debug('verify request={}'.format(self.lti_kwargs.get('request')))
+        log.debug('verify request=%s', self.lti_kwargs.get('request'))
         if self.lti_kwargs.get('request') == 'session':
             self._verify_session()
         elif self.lti_kwargs.get('request') == 'initial':
@@ -95,7 +106,8 @@ class LTI(object):
         except LTINotInSessionException:
             self.verify_request()
 
-    def _verify_session(self):
+    @staticmethod
+    def _verify_session():
         """
         Verify that session was already created
 
@@ -116,14 +128,15 @@ class LTI(object):
         return consumers
 
     @property
-    def key(self):
+    def key(self):  # pylint: disable=no-self-use
         """
         OAuth Consumer Key
         :return: key
         """
         return session['oauth_consumer_key']
 
-    def message_identifier_id(self):
+    @staticmethod
+    def message_identifier_id():
         """
         Message identifier to use for XML callback
 
@@ -132,7 +145,7 @@ class LTI(object):
         return "edX_fix"
 
     @property
-    def lis_result_sourcedid(self):
+    def lis_result_sourcedid(self):  # pylint: disable=no-self-use
         """
         lis_result_sourcedid to use for XML callback
 
@@ -141,15 +154,16 @@ class LTI(object):
         return session['lis_result_sourcedid']
 
     @property
-    def role(self):
+    def role(self):  # pylint: disable=no-self-use
         """
         LTI roles
 
         :return: roles
         """
-        return session['roles']
+        return session.get('roles')
 
-    def is_role(self, role):
+    @staticmethod
+    def is_role(role):
         """
         Verify if user is in role
 
@@ -157,13 +171,18 @@ class LTI(object):
         :return: if user is in role
         :exception: LTIException if role is unknown
         """
-        log.debug("is_role {}".format(role))
-        roles = session['roles']
+        log.debug("is_role %s", role)
+        roles = session['roles'].split(',')
         if role in LTI_ROLES:
-            list = LTI_ROLES[role]
-            log.debug("is_role roles_list={} role={} in list={}"
-                      .format(list, roles, roles in list))
-            return roles in list
+            role_list = LTI_ROLES[role]
+            # find the intersection of the roles
+            roles = set(role_list) & set(roles)
+            is_user_role_there = len(roles) >= 1
+            log.debug(
+                "is_role roles_list=%s role=%s in list=%s", role_list,
+                roles, is_user_role_there
+            )
+            return is_user_role_there
         else:
             raise LTIException("Unknown role {}.".format(role))
 
@@ -176,9 +195,10 @@ class LTI(object):
         role = u'any'
         if 'role' in self.lti_kwargs:
             role = self.lti_kwargs['role']
-        log.debug("check_role lti_role={} decorator_role={}"
-                  .format(self.role, role))
-        if not self.is_role(role):
+        log.debug(
+            "check_role lti_role=%s decorator_role=%s", self.role, role
+        )
+        if not (role == u'any' or self.is_role(role)):
             raise LTIRoleException('Not authorized.')
 
     @property
@@ -223,8 +243,7 @@ class LTI(object):
             # session dict for use in views
             for prop in LTI_PROPERTY_LIST:
                 if params.get(prop, None):
-                    log.debug("params {}={}".format(prop,
-                                                    params.get(prop, None)))
+                    log.debug("params %s=%s", prop, params.get(prop, None))
                     session[prop] = params[prop]
 
             # Set logged in session key
@@ -297,7 +316,8 @@ class LTI(object):
 
         return False
 
-    def close_session(self):
+    @staticmethod
+    def close_session():
         """
         Invalidates session
         """
@@ -307,34 +327,38 @@ class LTI(object):
         session[LTI_SESSION_KEY] = False
 
 
-def lti(app=None, request=None, error=None, role='any',
-        *lti_args_out, **lti_kwargs_out):
+def lti(app=None, request='any', error=default_error, role='any',
+        *lti_args, **lti_kwargs):
     """
     LTI decorator
 
-    :param: app - Flask App object (required)
-    :param: error - Callback if LTI throws exception (required)
-    :param: request - Request type (default: any)
+    :param: app - Flask App object (optional).
+        :py:attr:`flask.current_app` is used if no object is passed in.
+    :param: error - Callback if LTI throws exception (optional).
+        :py:attr:`pylti.flask.default_error` is the default.
+    :param: request - Request type from
+        :py:attr:`pylti.common.LTI_REQUEST_TYPE`. (default: any)
     :param: roles - LTI Role (default: any)
     :return: wrapper
     """
 
-    def _lti(function, lti_args=None, lti_kwargs=None):
+    def _lti(function):
         """
         Inner LTI decorator
 
         :param: function:
-        :param: lti_args:
-        :param: lti_kwargs:
         :return:
         """
 
         @wraps(function)
         def wrapper(*args, **kwargs):
+            """
+            Pass LTI reference to function or return error.
+            """
             try:
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
-                the_lti._check_role()
+                the_lti._check_role()  # pylint: disable=protected-access
                 kwargs['lti'] = the_lti
                 return function(*args, **kwargs)
             except LTIException as lti_exception:
@@ -346,11 +370,15 @@ def lti(app=None, request=None, error=None, role='any',
                 return error(exception=exception)
 
         return wrapper
-    lti_kwargs_out['app'] = app
-    lti_kwargs_out['request'] = request
-    lti_kwargs_out['error'] = error
-    lti_kwargs_out['role'] = role
 
-    ret = partial(_lti, lti_args=lti_args_out, lti_kwargs=lti_kwargs_out)
+    lti_kwargs['request'] = request
+    lti_kwargs['error'] = error
+    lti_kwargs['role'] = role
 
-    return ret
+    if (not app) or isinstance(app, Flask):
+        lti_kwargs['app'] = app
+        return _lti
+    else:
+        # We are wrapping without arguments
+        lti_kwargs['app'] = None
+        return _lti(app)

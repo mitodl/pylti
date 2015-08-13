@@ -35,12 +35,13 @@ LTI_PROPERTY_LIST = [
     'lis_outcome_service_url'
 ]
 
+
 LTI_ROLES = {
     u'staff': [u'Administrator', u'Instructor', ],
     u'instructor': [u'Instructor', ],
     u'administrator': [u'Administrator', ],
-    u'student': [u'Student', ],
-    u'any': [u'Administrator', u'Instructor', u'Student', ],
+    u'student': [u'Student', u'Learner', ]
+    # There is also a special role u'any' that ignores role check
 }
 
 LTI_SESSION_KEY = u'lti_authenticated'
@@ -49,6 +50,7 @@ LTI_REQUEST_TYPE = [u'any', u'initial', u'session']
 
 
 class LTIOAuthDataStore(oauth.OAuthDataStore):
+    # pylint: disable=abstract-method
     """
     Largely taken from reference implementation
     for app engine at https://code.google.com/p/ims-dev/
@@ -152,7 +154,7 @@ def _post_patched_request(consumers, lti_key, body,
     :param url: outcome url
     :return: response
     """
-
+    # pylint: disable=too-many-locals, too-many-arguments
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
     oauth_server.add_signature_method(oauth.OAuthSignatureMethod_HMAC_SHA1())
@@ -166,7 +168,7 @@ def _post_patched_request(consumers, lti_key, body,
 
     if lti_cert:
         client.add_certificate(key=lti_cert, cert=lti_cert, domain='')
-        log.debug("cert {}".format(lti_cert))
+        log.debug("cert %s", lti_cert)
 
     import httplib2
 
@@ -185,8 +187,6 @@ def _post_patched_request(consumers, lti_key, body,
 
     http._normalize_headers = my_normalize
     monkey_patch_function = normalize
-
-    # pylint: disable=unused-variable
     response, content = client.request(
         url,
         method,
@@ -197,11 +197,11 @@ def _post_patched_request(consumers, lti_key, body,
     # pylint: disable=protected-access
     http._normalize_headers = monkey_patch_function
 
-    log.debug("key {}".format(lti_key))
-    log.debug("secret {}".format(secret))
-    log.debug("url {}".format(url))
-    log.debug("response {}".format(response))
-    log.debug("content {}".format(content))
+    log.debug("key %s", lti_key)
+    log.debug("secret %s", secret)
+    log.debug("url %s", url)
+    log.debug("response %s", response)
+    log.debug("content %s", format(content))
 
     return response, content
 
@@ -218,7 +218,7 @@ def post_message(consumers, lti_key, url, body):
     """
     content_type = 'application/xml'
     method = 'POST'
-    (response, content) = _post_patched_request(
+    (_, content) = _post_patched_request(
         consumers,
         lti_key,
         body,
@@ -228,7 +228,7 @@ def post_message(consumers, lti_key, url, body):
     )
 
     is_success = "<imsx_codeMajor>success</imsx_codeMajor>" in content
-    log.debug("is success {}".format(is_success))
+    log.debug("is success %s", is_success)
     return is_success
 
 
@@ -243,7 +243,8 @@ def post_message2(consumers, lti_key, url, body,
     :param: body: xml body
     :return: success
     """
-    (response, content) = _post_patched_request(
+    # pylint: disable=too-many-arguments
+    (response, _) = _post_patched_request(
         consumers,
         lti_key,
         body,
@@ -253,7 +254,7 @@ def post_message2(consumers, lti_key, url, body,
     )
 
     is_success = response.status == 200
-    log.debug("is success {}".format(is_success))
+    log.debug("is success %s", is_success)
 
     return is_success
 
@@ -270,11 +271,11 @@ def verify_request_common(consumers, url, method, headers, params):
     :return: is request valid
     """
 
-    log.debug("consumers {}".format(consumers))
-    log.debug("url {}".format(url))
-    log.debug("method {}".format(method))
-    log.debug("headers {}".format(headers))
-    log.debug("params {}".format(params))
+    log.debug("consumers %s", consumers)
+    log.debug("url %s", url)
+    log.debug("method %s", method)
+    log.debug("headers %s", headers)
+    log.debug("params %s", params)
 
     oauth_store = LTIOAuthDataStore(consumers)
     oauth_server = oauth.OAuthServer(oauth_store)
@@ -285,7 +286,7 @@ def verify_request_common(consumers, url, method, headers, params):
 
     # Check header for SSL before selecting the url
     if headers.get('X-Forwarded-Proto', 'http') == 'https':
-        url = url.replace('http', 'https', 1)
+        url = url.replace('http:', 'https:', 1)
 
     oauth_request = oauth.OAuthRequest.from_request(
         method,
@@ -312,6 +313,7 @@ def verify_request_common(consumers, url, method, headers, params):
 
 def generate_request_xml(message_identifier_id, operation,
                          lis_result_sourcedid, score):
+    # pylint: disable=too-many-locals
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.
 
@@ -350,5 +352,5 @@ def generate_request_xml(message_identifier_id, operation,
     ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
         etree.tostring(root, encoding='utf-8'))
 
-    log.debug("XML Response: \n{}".format(ret))
+    log.debug("XML Response: \n%s", ret)
     return ret

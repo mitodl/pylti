@@ -7,10 +7,7 @@ import semantic_version
 
 import httpretty
 import oauthlib.oauth1
-try:
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    from urlparse import urlparse, parse_qs
+from urlparse import urlparse, parse_qs
 import urllib
 
 import pylti
@@ -29,6 +26,9 @@ class TestCommon(unittest.TestCase):
     """
     Tests for common.py
     """
+    # pylint: disable=too-many-public-methods
+
+    # Valid XML response from LTI 1.0 consumer
     expected_response = """<?xml version="1.0" encoding="UTF-8"?>
 <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1\
 /xsd/imsoms_v1p0">
@@ -51,11 +51,14 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 </imsx_POXEnvelopeResponse>
         """
 
-    def test_version(self):
-        # Will raise ValueError if not a semantic version
+    @staticmethod
+    def test_version():
+        """
+        Will raise ValueError if not a semantic version
+        """
         semantic_version.Version(pylti.VERSION)
 
-    def test_ltioauthdatastore(self):
+    def test_lti_oauth_data_store(self):
         """
         Tests that LTIOAuthDataStore works
         """
@@ -76,11 +79,11 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertIsNone(store.lookup_consumer("keyNS"))
         self.assertIsNone(store.lookup_cert("keyNS"))
 
-    def test_ltioauthdatastore_no_consumers(self):
+    def test_lti_oauth_data_store_no_consumers(self):
         """
         If consumers are not given it there are no consumer to return.
-
         """
+
         store = LTIOAuthDataStore(None)
         self.assertIsNone(store.lookup_consumer("key1"))
         self.assertIsNone(store.lookup_cert("key1"))
@@ -90,8 +93,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         verify_request_common succeeds on valid request
         """
         headers = dict()
-        consumers, method, url, verify_params, params = \
+        consumers, method, url, verify_params, _ = (
             self.generate_oauth_request()
+        )
         ret = verify_request_common(consumers, url, method,
                                     headers, verify_params)
         self.assertTrue(ret)
@@ -103,26 +107,24 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         headers = dict()
         headers['X-Forwarded-Proto'] = 'https'
         orig_url = 'https://localhost:5000/?'
-        consumers, method, url, verify_params, params = \
+        consumers, method, url, verify_params, _ = (
             self.generate_oauth_request(url_to_sign=orig_url)
+        )
+
         ret = verify_request_common(consumers, url, method,
                                     headers, verify_params)
         self.assertTrue(ret)
 
-    def test_verify_request_common_no_auth_fields(self):
+    def test_verify_request_common_no_oauth_fields(self):
         """
         verify_request_common fails on missing authentication
         """
         headers = dict()
-        consumers, method, url, verify_params, params = \
+        consumers, method, url, _, params = (
             self.generate_oauth_request()
-        ret = False
-        try:
-            ret = verify_request_common(consumers, url, method,
-                                        headers, params)
-        except LTIException:
-            self.assertTrue(True)
-        self.assertFalse(ret)
+        )
+        with self.assertRaises(LTIException):
+            verify_request_common(consumers, url, method, headers, params)
 
     def test_verify_request_common_no_params(self):
         """
@@ -135,13 +137,8 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         method = 'GET'
         headers = dict()
         params = dict()
-        ret = False
-        try:
-            ret = verify_request_common(consumers, url, method,
-                                        headers, params)
-        except LTIException:
-            self.assertTrue(True)
-        self.assertFalse(ret)
+        with self.assertRaises(LTIException):
+            verify_request_common(consumers, url, method, headers, params)
 
     @httpretty.activate
     def test_post_response_invalid_xml(self):
@@ -153,6 +150,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                u'handler_noauth/grade_handler')
 
         def request_callback(request, cburi, headers):
+            # pylint: disable=unused-argument
+            """
+            Mock success response.
+            """
             return 200, headers, "success"
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
@@ -171,6 +172,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         uri = 'https://localhost:8000/dev_stack'
 
         def request_callback(request, cburi, headers):
+            # pylint: disable=unused-argument,
+            """
+            Mock expected response.
+            """
             return 200, headers, self.expected_response
 
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
@@ -215,14 +220,15 @@ imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0\
 lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>\
 </imsx_POXBody></imsx_POXEnvelopeRequest>""")
 
-    def generate_oauth_request(self, url_to_sign=None):
+    @staticmethod
+    def generate_oauth_request(url_to_sign=None):
         """
         This code generated valid LTI 1.0 basic-lti-launch-request request
         """
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
-        url = 'http://localhost:5000/?'
+        url = url_to_sign or 'http://localhost:5000/?'
         method = 'GET'
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-'
                                       u'lti-94173d3e79d145fd8ec2e83f15836ac8',
@@ -241,8 +247,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
                                              u'94173d3e79d145fd8ec2e83f1583'
                                              u'6ac8/handler_noauth'
                                              u'/grade_handler',
-                  'lti_message_type': u'basic-lti-launch-request',
-                  }
+                  'lti_message_type': u'basic-lti-launch-request'}
         urlparams = urllib.urlencode(params)
 
         client = oauthlib.oauth1.Client('__consumer_key__',
@@ -251,11 +256,11 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
                                         SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.
                                         SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(url_to_sign or url, urlparams))
+        signature = client.sign("{}{}".format(url, urlparams))
 
-        q = urlparse(signature[0])
-        qs = parse_qs(q.query, keep_blank_values=True)
+        url_parts = urlparse(signature[0])
+        query_string = parse_qs(url_parts.query, keep_blank_values=True)
         verify_params = dict()
-        for k, v in qs.iteritems():
-            verify_params[k] = v[0]
+        for key, value in query_string.iteritems():
+            verify_params[key] = value[0]
         return consumers, method, url, verify_params, params

@@ -27,6 +27,11 @@ Getting Started
 Changes
 =======
 
+v0.4.1
+~~~~~~
+
+- Pin mock to allow ``python setup.py test`` without setuptools upgrade
+
 v0.4.0
 ~~~~~~
 

@@ -263,7 +263,7 @@ class LTI(object):
         Post grade to LTI consumer using XML
 
         :param: grade: 0 <= grade <= 1
-        :return: True is post successful and grade valid
+        :return: True if post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
         message_identifier_id = self.message_identifier_id()
@@ -290,7 +290,7 @@ class LTI(object):
         https://openedx.atlassian.net/browse/PLAT-281
 
         :param: grade: 0 <= grade <= 1
-        :return: True is post successful and grade valid
+        :return: True if post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
         content_type = 'application/vnd.ims.lis.v2.result+json'

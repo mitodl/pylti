@@ -190,7 +190,7 @@ class LTI(object):
         """
         Check that user is in role specified as wrapper attribute
 
-        :exception: LTIException if user is not in roles
+        :exception: LTIRoleException if user is not in roles
         """
         role = u'any'
         if 'role' in self.lti_kwargs:

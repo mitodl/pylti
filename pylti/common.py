@@ -32,15 +32,23 @@ LTI_PROPERTY_LIST = [
     'lti_message',
     'lti_version',
     'roles',
+    'ext_roles',
     'lis_outcome_service_url'
 ]
 
 
 LTI_ROLES = {
-    u'staff': [u'Administrator', u'Instructor', ],
-    u'instructor': [u'Instructor', ],
-    u'administrator': [u'Administrator', ],
-    u'student': [u'Student', u'Learner', ]
+    u'staff': [u'Administrator',
+               u'Instructor',
+               u'urn:lti:instrole:ims/lis/Administrator'],
+    u'instructor': [u'Instructor',
+                    u'urn:lti:instrole:ims/lis/Instructor'],
+    u'administrator': [u'Administrator',
+                       u'urn:lti:instrole:ims/lis/Administrator',
+                       u'urn:lti:sysrole:ims/lis/SysAdmin'],
+    u'student': [u'Student', u'Learner',
+                 u'urn:lti:instrole:ims/lis/Learner',
+                 u'urn:lti:instrole:ims/lis/Student']
     # There is also a special role u'any' that ignores role check
 }
 

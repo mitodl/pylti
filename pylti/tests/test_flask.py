@@ -254,6 +254,19 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app.get(new_url)
         self.assertFalse(self.has_exception())
 
+    def test_access_to_oauth_resource_staff_only_as_lti_administrator(self):
+        """
+        Allow access if user in role.
+        """
+        consumers = self.consumers
+        url = 'http://localhost/initial_staff?'
+        new_url = self.generate_launch_request(
+            consumers, url, roles='urn:lti:instrole:ims/lis/Administrator'
+        )
+
+        self.app.get(new_url)
+        self.assertFalse(self.has_exception())
+
     def test_access_to_oauth_resource_staff_only_as_unknown_role(self):
         """
         Deny access if role not defined.
@@ -287,12 +300,42 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app.get(student_url)
         self.assertFalse(self.has_exception())
 
+    def test_access_to_oauth_resource_student_as_lti_student(self):
+        """
+        Verify that the various roles we consider as students are students.
+        """
+        consumers = self.consumers
+        url = 'http://localhost/initial_student?'
+
+        # Learner Role
+        learner_url = self.generate_launch_request(
+            consumers, url, roles='urn:lti:instrole:ims/lis/Learner'
+        )
+        self.app.get(learner_url)
+        self.assertFalse(self.has_exception())
+
+        student_url = self.generate_launch_request(
+            consumers, url, roles='urn:lti:instrole:ims/lis/Student'
+        )
+        self.app.get(student_url)
+        self.assertFalse(self.has_exception())
+
     def test_access_to_oauth_resource_student_as_staff(self):
         """Verify staff doesn't have access to student only."""
         consumers = self.consumers
         url = 'http://localhost/initial_unknown?'
         staff_url = self.generate_launch_request(
             consumers, url, roles='Staff'
+        )
+        self.app.get(staff_url)
+        self.assertTrue(self.has_exception())
+
+    def test_access_to_oauth_resource_student_as_lti_staff(self):
+        """Verify staff doesn't have access to student only."""
+        consumers = self.consumers
+        url = 'http://localhost/initial_unknown?'
+        staff_url = self.generate_launch_request(
+            consumers, url, roles='urn:lti:instrole:ims/lis/Administrator'
         )
         self.app.get(staff_url)
         self.assertTrue(self.has_exception())

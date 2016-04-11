@@ -34,6 +34,14 @@ def default_error(exception=None):
     return "There was an LTI communication error", 500
 
 
+def session_roles():
+    """
+    Return the full session roles which can be in 'roles' and 'ext_roles'
+    :return: roles
+    """
+    return ",".join((session.get('roles', ''), session.get('ext_roles', '')))
+
+
 class LTI(object):
     """
     LTI Object represents abstraction of current LTI session. It provides
@@ -160,7 +168,7 @@ class LTI(object):
 
         :return: roles
         """
-        return session.get('roles')
+        return session_roles()
 
     @staticmethod
     def is_role(role):
@@ -172,7 +180,7 @@ class LTI(object):
         :exception: LTIException if role is unknown
         """
         log.debug("is_role %s", role)
-        roles = session['roles'].split(',')
+        roles = session_roles().split(',')
         if role in LTI_ROLES:
             role_list = LTI_ROLES[role]
             # find the intersection of the roles

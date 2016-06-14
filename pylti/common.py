@@ -5,6 +5,7 @@ Common classes and methods for PyLTI module
 
 from __future__ import absolute_import
 import logging
+import sys
 
 import oauth2
 import oauth.oauth as oauth
@@ -303,10 +304,10 @@ def verify_request_common(consumers, url, method, headers, params):
         # pylint: disable=protected-access
         consumer = oauth_server._get_consumer(oauth_request)
         oauth_server._check_signature(oauth_request, consumer, None)
-    except oauth.OAuthError:
+    except oauth.OAuthError as e:
         # Rethrow our own for nice error handling (don't print
         # error message as it will contain the key
-        raise LTIException("OAuth error: Please check your key and secret")
+        raise LTIException("OAuth error: %s" %(e.message, )), None, sys.exc_info()[2]
 
     return True
 

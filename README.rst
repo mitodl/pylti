@@ -35,21 +35,21 @@ Flask      `mit_lti_flask_sample
 
 Dependencies:
 =============
-* Python 2.7+
-* oauth 1.0.1+
-* oauth2 1.5.211+
+* Python 2.7+ or Python 3.4+
+* oauth2 1.9.0+
 * httplib2 0.9+
+* six 1.10.0+
 
 Development dependencies:
 =========================
 * Flask 0.10.1
 * httpretty 0.8.3
 * oauthlib 0.6.3
-* pyflakes 0.8.1
-* pytest 2.6.3
+* pyflakes 1.2.3
+* pytest 2.9.2
 * pytest-cache 1.0
-* pytest-cov 1.8.0
-* pytest-flakes 0.2
+* pytest-cov 2.3.0
+* pytest-flakes 1.0.1
 * pytest-pep8 1.0.6
 * sphinx 1.2.3
 

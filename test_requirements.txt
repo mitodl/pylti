@@ -1,9 +1,11 @@
-pytest-cov>=1.8.0
+pytest-cov>=2.3.0
 pytest-pep8>=1.0.6
-pytest-flakes>=0.2
-pytest>=2.6.3
+pytest-flakes>=1.0.1
+pytest>=2.9.2
 httpretty>=0.8.3
 flask>=0.10.1
 oauthlib>=0.6.3
 semantic_version>=2.3.1
 mock>=1.0.1
+oauth2>=1.9.0.post1
+six>=1.10.0

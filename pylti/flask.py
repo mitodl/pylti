@@ -214,9 +214,9 @@ class LTI(object):
         urls = app_config.get('PYLTI_URL_FIX', dict())
         # url remapping is useful for using devstack
         # devstack reports httpS://localhost:8000/ and listens on HTTP
-        for prefix, mapping in urls.iteritems():
+        for prefix, mapping in urls.items():
             if url.startswith(prefix):
-                for _from, _to in mapping.iteritems():
+                for _from, _to in mapping.items():
                     url = url.replace(_from, _to)
         return url
 

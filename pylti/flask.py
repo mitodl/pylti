@@ -327,7 +327,7 @@ class LTI(object):
         session[LTI_SESSION_KEY] = False
 
 
-def lti(app=None, request='any', error=default_error, role='any',url=None,
+def lti(app=None, request='any', error=default_error, role='any', url=None,
         *lti_args, **lti_kwargs):
     """
     LTI decorator

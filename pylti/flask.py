@@ -339,13 +339,13 @@ def lti(app=None, request='any', error=default_error, role='any', url=None,
     :param: request - Request type from
         :py:attr:`pylti.common.LTI_REQUEST_TYPE`. (default: any)
     :param: roles - LTI Role (default: any)
-	:param: url - This is an optional setting that allows you to set 
-		the url directly. For example, if you have a web
-		server as a proxy in front of the Flask server with a url of
-		https://abc.com/app that is mapped to your Flask server url
-		that is at https://abc.com/ then you can use this parameter 
-		like this: 	url='https://abc.com/app'
-		
+    :param: url - This is an optional setting that allows you to set
+        the url directly. For example, if you have a web
+        server as a proxy in front of the Flask server with a url of
+        https://abc.com/app that is mapped to your Flask server url
+        that is at https://abc.com/ then you can use this parameter
+        like this: 	url='https://abc.com/app'
+
     :return: wrapper
     """
 

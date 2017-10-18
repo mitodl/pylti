@@ -58,7 +58,7 @@ try:
                                 "pytest-flakes>=1.0.1", "pytest>=2.9.2",
                                 "httpretty>=0.8.3", "flask>=0.10.1",
                                 "oauthlib>=0.6.3", "semantic_version>=2.3.1",
-                                "mock==1.0.1"],
+                                "mock==1.3.0"],
                  cmdclass={"test": PyTest},
                  install_requires=["oauth2>=1.9.0.post1", "httplib2>=0.9", "six>=1.10.0"],
                  include_package_data=True,

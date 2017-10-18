@@ -3,13 +3,14 @@
 #
 # This file is part of PyLTI.
 #
+from __future__ import print_function
 
 import os
 import sys
 
 if sys.version_info < (2, 7):
     error = "ERROR: PyLTI requires Python 2.7+ ... exiting."
-    print >> sys.stderr, error
+    print(error, file=sys.stderr)
     sys.exit(1)
 
 try:
@@ -114,10 +115,10 @@ except ImportError as err:
             out = [item for item in out if not fnmatchcase(item, pat)]
         return out
 
-    print "Non-Fatal Error:", err, "\n"
-    print "Setup encountered an error while importing setuptools (see above)."
-    print "Proceeding anyway with manual replacements for setuptools.find_packages."
-    print "Try installing setuptools if you continue to have problems.\n\n"
+    print("Non-Fatal Error:", err, "\n")
+    print("Setup encountered an error while importing setuptools (see above).")
+    print("Proceeding anyway with manual replacements for setuptools.find_packages.")
+    print("Try installing setuptools if you continue to have problems.\n\n")
 
     extra = dict()
 

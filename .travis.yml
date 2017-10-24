@@ -1,15 +1,17 @@
 # http://travis-ci.org/#!/mitxlti/pylti
 language: python
-sudo: false
+
 python:
     - 2.7
+    - 3.5
+    - 3.6
 install:
-    - python setup.py install --quiet
-    - pip install --upgrade -r test_requirements.txt
+    - python setup.py install
+    - pip install -r test_requirements.txt
     - pip install coveralls
 script:
     - python setup.py test --coverage --pep8 --flakes
     - coverage run --source=pylti setup.py test 
 after_success: 
-    coveralls
+    - coveralls
 

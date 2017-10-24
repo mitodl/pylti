@@ -3,6 +3,7 @@
 #
 # This file is part of PyLTI.
 #
+from __future__ import print_function
 
 from __future__ import print_function
 

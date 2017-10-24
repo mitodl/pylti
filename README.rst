@@ -1,7 +1,6 @@
 PyLTI - LTI done right
 =========================
 :PyLTI: Python implementation of LTI
-:Version: 0.4.1
 :Author: MIT Office of Digital Learning
 :Homepage: http://odl.mit.edu
 :License: BSD

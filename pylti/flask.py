@@ -190,7 +190,7 @@ class LTI(object):
         """
         Check that user is in role specified as wrapper attribute
 
-        :exception: LTIException if user is not in roles
+        :exception: LTIRoleException if user is not in roles
         """
         role = u'any'
         if 'role' in self.lti_kwargs:
@@ -214,9 +214,9 @@ class LTI(object):
         urls = app_config.get('PYLTI_URL_FIX', dict())
         # url remapping is useful for using devstack
         # devstack reports httpS://localhost:8000/ and listens on HTTP
-        for prefix, mapping in urls.iteritems():
+        for prefix, mapping in urls.items():
             if url.startswith(prefix):
-                for _from, _to in mapping.iteritems():
+                for _from, _to in mapping.items():
                     url = url.replace(_from, _to)
         return url
 
@@ -263,7 +263,7 @@ class LTI(object):
         Post grade to LTI consumer using XML
 
         :param: grade: 0 <= grade <= 1
-        :return: True is post successful and grade valid
+        :return: True if post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
         message_identifier_id = self.message_identifier_id()
@@ -290,7 +290,7 @@ class LTI(object):
         https://openedx.atlassian.net/browse/PLAT-281
 
         :param: grade: 0 <= grade <= 1
-        :return: True is post successful and grade valid
+        :return: True if post successful and grade valid
         :exception: LTIPostMessageException if call failed
         """
         content_type = 'application/vnd.ims.lis.v2.result+json'

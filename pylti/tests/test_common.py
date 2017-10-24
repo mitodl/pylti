@@ -7,12 +7,12 @@ import semantic_version
 
 import httpretty
 import oauthlib.oauth1
-from urlparse import urlparse, parse_qs
-import urllib
+
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs
 
 import pylti
 from pylti.common import (
-    LTIOAuthDataStore,
+    LTIOAuthServer,
     verify_request_common,
     LTIException,
     post_message,
@@ -58,9 +58,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         semantic_version.Version(pylti.VERSION)
 
-    def test_lti_oauth_data_store(self):
+    def test_lti_oauth_server(self):
         """
-        Tests that LTIOAuthDataStore works
+        Tests that LTIOAuthServer works
         """
         consumers = {
             "key1": {"secret": "secret1"},
@@ -69,7 +69,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
             "keyNS": {"test": "test"},
             "keyWCert": {"secret": "secret", "cert": "cert"},
         }
-        store = LTIOAuthDataStore(consumers)
+        store = LTIOAuthServer(consumers)
         self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
         self.assertEqual(store.lookup_consumer("key2").secret, "secret2")
         self.assertEqual(store.lookup_consumer("key3").secret, "secret3")
@@ -79,12 +79,12 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertIsNone(store.lookup_consumer("keyNS"))
         self.assertIsNone(store.lookup_cert("keyNS"))
 
-    def test_lti_oauth_data_store_no_consumers(self):
+    def test_lti_oauth_server_no_consumers(self):
         """
         If consumers are not given it there are no consumer to return.
         """
 
-        store = LTIOAuthDataStore(None)
+        store = LTIOAuthServer(None)
         self.assertIsNone(store.lookup_consumer("key1"))
         self.assertIsNone(store.lookup_cert("key1"))
 
@@ -248,7 +248,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
                                              u'6ac8/handler_noauth'
                                              u'/grade_handler',
                   'lti_message_type': u'basic-lti-launch-request'}
-        urlparams = urllib.urlencode(params)
+        urlparams = urlencode(params)
 
         client = oauthlib.oauth1.Client('__consumer_key__',
                                         client_secret='__lti_secret__',
@@ -261,6 +261,6 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
         url_parts = urlparse(signature[0])
         query_string = parse_qs(url_parts.query, keep_blank_values=True)
         verify_params = dict()
-        for key, value in query_string.iteritems():
+        for key, value in query_string.items():
             verify_params[key] = value[0]
         return consumers, method, url, verify_params, params

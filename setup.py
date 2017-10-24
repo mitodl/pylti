@@ -4,12 +4,14 @@
 # This file is part of PyLTI.
 #
 
+from __future__ import print_function
+
 import os
 import sys
 
 if sys.version_info < (2, 7):
     error = "ERROR: PyLTI requires Python 2.7+ ... exiting."
-    print >> sys.stderr, error
+    print(error, file=sys.stderr)
     sys.exit(1)
 
 try:
@@ -48,24 +50,17 @@ try:
         def run_tests(self):
             # import here, cause outside the eggs aren't loaded
             import pytest
-            # Needed in order for pytest_cache to load properly
-            # Alternate fix: import pytest_cache and pass to pytest.main
-            import _pytest.config
-
-            pm = _pytest.config.get_plugin_manager()
-            pm.consider_setuptools_entrypoints()
             errno = pytest.main(self.test_args)
             sys.exit(errno)
 
     extra = dict(test_suite="pylti.tests",
-                 tests_require=["pytest-cov>=1.8.0", "pytest-pep8>=1.0.6",
-                                "pytest-flakes>=0.2", "pytest>=2.6.3",
+                 tests_require=["pytest-cov>=2.3.0", "pytest-pep8>=1.0.6",
+                                "pytest-flakes>=1.0.1", "pytest>=2.9.2",
                                 "httpretty>=0.8.3", "flask>=0.10.1",
                                 "oauthlib>=0.6.3", "semantic_version>=2.3.1",
                                 "mock==1.0.1"],
                  cmdclass={"test": PyTest},
-                 install_requires=["oauth>=1.0.1", "oauth2>=1.5.211",
-                     "httplib2>=0.9" ],
+                 install_requires=["oauth2>=1.9.0.post1", "httplib2>=0.9", "six>=1.10.0"],
                  include_package_data=True,
                  zip_safe=False)
 except ImportError as err:
@@ -114,10 +109,10 @@ except ImportError as err:
             out = [item for item in out if not fnmatchcase(item, pat)]
         return out
 
-    print "Non-Fatal Error:", err, "\n"
-    print "Setup encountered an error while importing setuptools (see above)."
-    print "Proceeding anyway with manual replacements for setuptools.find_packages."
-    print "Try installing setuptools if you continue to have problems.\n\n"
+    print("Non-Fatal Error:", err, "\n")
+    print("Setup encountered an error while importing setuptools (see above).")
+    print("Proceeding anyway with manual replacements for setuptools.find_packages.")
+    print("Try installing setuptools if you continue to have problems.\n\n")
 
     extra = dict()
 

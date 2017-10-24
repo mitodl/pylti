@@ -116,7 +116,7 @@ except ImportError as err:
 
     extra = dict()
 
-VERSION = __import__('pylti').VERSION
+VERSION = __import__('pylti').__version__
 
 README = open('README.rst').read()
 

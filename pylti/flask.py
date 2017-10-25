@@ -208,7 +208,10 @@ class LTI(object):
         uses PYLTI_URL_FIX map to support edX dev-stack
 
         :return: remapped lis_outcome_service_url
+        :exception: LTIException if lis_outcome_service_url isn't present.
         """
+        if 'lis_outcome_service_url' not in session:
+            raise LTIException('lis_outcome_service_url isn\'t present.')
         url = session['lis_outcome_service_url']
         app_config = self.lti_kwargs['app'].config
         urls = app_config.get('PYLTI_URL_FIX', dict())

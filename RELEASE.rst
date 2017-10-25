@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.5.1
+-------------
+
+- Add setup.cfg to allow universal wheel building (py2 + py3)
+- Changed the version variable in __init__
+
 Version 0.5.0
 -------------
 

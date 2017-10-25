@@ -56,7 +56,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Will raise ValueError if not a semantic version
         """
-        semantic_version.Version(pylti.VERSION)
+        semantic_version.Version(pylti.__version__)
 
     def test_lti_oauth_server(self):
         """

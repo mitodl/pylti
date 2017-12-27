@@ -306,7 +306,7 @@ def verify_request_common(consumers, url, method, headers, params):
 
 
 def generate_request_xml(message_identifier_id, operation,
-                         lis_result_sourcedid, score):
+                         lis_result_sourcedid, score, launch_url):
     # pylint: disable=too-many-locals
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.
@@ -315,6 +315,7 @@ def generate_request_xml(message_identifier_id, operation,
     :param operation:
     :param lis_result_sourcedid:
     :param score:
+    :param launch_url:
     :return: XML string
     """
     root = etree.Element(u'imsx_POXEnvelopeRequest',
@@ -343,6 +344,10 @@ def generate_request_xml(message_identifier_id, operation,
         language.text = 'en'
         text_string = etree.SubElement(result_score, 'textString')
         text_string.text = score.__str__()
+        if launch_url:
+            result_data = etree.SubElement(result, 'resultData')
+            lti_launch_url = etree.SubElement(result_data, 'ltiLaunchUrl')
+            lti_launch_url.text = launch_url
     ret = "<?xml version='1.0' encoding='utf-8'?>\n{}".format(
         etree.tostring(root, encoding='utf-8').decode('utf-8'))
 

@@ -306,7 +306,7 @@ def verify_request_common(consumers, url, method, headers, params):
 
 
 def generate_request_xml(message_identifier_id, operation,
-                         lis_result_sourcedid, score, launch_url):
+                         lis_result_sourcedid, score, launch_url=None):
     # pylint: disable=too-many-locals
     """
     Generates LTI 1.1 XML for posting result to LTI consumer.

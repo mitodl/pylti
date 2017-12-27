@@ -233,6 +233,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID><result><resultScore>\
 <resultData><ltiLaunchUrl>https://somelaunchurl/</ltiLaunchUrl></resultData>\
 </result></resultRecord></operationRequest></imsx_POXBody>\
 </imsx_POXEnvelopeRequest>""")
+
     @staticmethod
     def generate_oauth_request(url_to_sign=None):
         """

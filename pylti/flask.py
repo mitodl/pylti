@@ -96,15 +96,31 @@ class LTI(object):
 
     def _verify_any(self):
         """
-        Verify that request is in session or initial request
+        Verify that an initial request has been made, or failing that, that
+        the request is in the session
 
         :raises: LTIException
         """
         log.debug('verify_any enter')
-        try:
-            self._verify_session()
-        except LTINotInSessionException:
+
+        # Check to see if there is a new LTI launch request incoming
+        newrequest = False
+        if flask_request.method == 'POST':
+            params = flask_request.form.to_dict()
+            if params.get("lti_message_type", None) == "basic-lti-launch-request":
+                newrequest = True
+                # Scrub the session of the old authentication
+                for prop in LTI_PROPERTY_LIST:
+                    if session.get(prop, None):
+                        del session[prop]
+                session[LTI_SESSION_KEY] = False
+
+        # Attempt the appropriate validation
+        # Both of these methods raise LTIException as necessary
+        if newrequest:
             self.verify_request()
+        else:
+            self._verify_session()
 
     @staticmethod
     def _verify_session():

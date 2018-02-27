@@ -107,7 +107,8 @@ class LTI(object):
         newrequest = False
         if flask_request.method == 'POST':
             params = flask_request.form.to_dict()
-            if params.get("lti_message_type", None) == "basic-lti-launch-request":
+            initiation = "basic-lti-launch-request"
+            if params.get("lti_message_type", None) == initiation:
                 newrequest = True
                 # Scrub the session of the old authentication
                 for prop in LTI_PROPERTY_LIST:

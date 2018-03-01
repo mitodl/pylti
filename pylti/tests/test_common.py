@@ -22,6 +22,34 @@ from pylti.common import (
 from pylti.tests.util import TEST_CLIENT_CERT
 
 
+class ExceptionHandler(object):
+    """
+    Custom exception handler.
+    """
+    exception = None
+
+    def set(self, exception):
+        """
+        Setter: set class variable exception.
+        """
+        self.exception = exception
+
+    def get(self):
+        """
+        Return exception if not None otherwise returns None.
+        """
+        if self.exception is None:
+            return None
+        else:
+            return self.exception['exception']
+
+    def reset(self):
+        """
+        Reset variable exception
+        """
+        self.exception = None
+
+
 class TestCommon(unittest.TestCase):
     """
     Tests for common.py

@@ -6,7 +6,7 @@ Common classes and methods for PyLTI module
 from __future__ import absolute_import
 
 import logging
-
+import json
 import oauth2
 from xml.etree import ElementTree as etree
 
@@ -50,6 +50,12 @@ LTI_ROLES = {
 LTI_SESSION_KEY = u'lti_authenticated'
 
 LTI_REQUEST_TYPE = [u'any', u'initial', u'session']
+
+
+def default_error(exception=None):
+    """Render simple error page.  This should be overidden in applications."""
+    # pylint: disable=unused-argument
+    return "There was an LTI communication error", 500
 
 
 class LTIOAuthServer(oauth2.Server):
@@ -99,7 +105,6 @@ class LTIOAuthServer(oauth2.Server):
         if not consumer:
             log.info("Did not find consumer, using key: %s ", key)
             return None
-
         cert = consumer.get('cert', None)
         return cert
 
@@ -152,7 +157,6 @@ def _post_patched_request(consumers, lti_key, body,
     oauth_server.add_signature_method(SignatureMethod_HMAC_SHA1_Unicode())
     lti_consumer = oauth_server.lookup_consumer(lti_key)
     lti_cert = oauth_server.lookup_cert(lti_key)
-
     secret = lti_consumer.secret
 
     consumer = oauth2.Consumer(key=lti_key, secret=secret)
@@ -262,7 +266,6 @@ def verify_request_common(consumers, url, method, headers, params):
     :param params: request params
     :return: is request valid
     """
-
     log.debug("consumers %s", consumers)
     log.debug("url %s", url)
     log.debug("method %s", method)
@@ -285,7 +288,6 @@ def verify_request_common(consumers, url, method, headers, params):
         headers=dict(headers),
         parameters=params
     )
-
     if not oauth_request:
         log.info('Received non oauth request on oauth protected page')
         raise LTIException('This page requires a valid oauth session '
@@ -451,3 +453,191 @@ class Request_Fix_Duplicate(oauth2.Request):
         # (http://tools.ietf.org/html/draft-hammer-oauth-07#section-3.6)
         # Spaces must be encoded with "%20" instead of "+"
         return encoded_str.replace('+', '%20').replace('%7E', '~')
+
+
+class LTIBase(object):
+    """
+    LTI Object represents abstraction of current LTI session. It provides
+    callback methods and methods that allow developer to inspect
+    LTI basic-launch-request.
+
+    This object is instantiated by @lti wrapper.
+    """
+    def __init__(self, lti_args, lti_kwargs):
+        self.lti_args = lti_args
+        self.lti_kwargs = lti_kwargs
+        self.nickname = self.name
+
+    @property
+    def name(self):  # pylint: disable=no-self-use
+        """
+        Name returns user's name or user's email or user_id
+        :return: best guess of name to use to greet user
+        """
+        if 'lis_person_sourcedid' in self.session:
+            return self.session['lis_person_sourcedid']
+        elif 'lis_person_contact_email_primary' in self.session:
+            return self.session['lis_person_contact_email_primary']
+        elif 'user_id' in self.session:
+            return self.session['user_id']
+        else:
+            return ''
+
+    def verify(self):
+        """
+        Verify if LTI request is valid, validation
+        depends on @lti wrapper arguments
+
+        :raises: LTIException
+        """
+        log.debug('verify request=%s', self.lti_kwargs.get('request'))
+        if self.lti_kwargs.get('request') == 'session':
+            self._verify_session()
+        elif self.lti_kwargs.get('request') == 'initial':
+            self.verify_request()
+        elif self.lti_kwargs.get('request') == 'any':
+            self._verify_any()
+        else:
+            raise LTIException("Unknown request type")
+        return True
+
+    @property
+    def user_id(self):  # pylint: disable=no-self-use
+        """
+        Returns user_id as provided by LTI
+
+        :return: user_id
+        """
+        return self.session['user_id']
+
+    @property
+    def key(self):  # pylint: disable=no-self-use
+        """
+        OAuth Consumer Key
+        :return: key
+        """
+        return self.session['oauth_consumer_key']
+
+    @staticmethod
+    def message_identifier_id():
+        """
+        Message identifier to use for XML callback
+
+        :return: non-empty string
+        """
+        return "edX_fix"
+
+    @property
+    def lis_result_sourcedid(self):  # pylint: disable=no-self-use
+        """
+        lis_result_sourcedid to use for XML callback
+
+        :return: LTI lis_result_sourcedid
+        """
+        return self.session['lis_result_sourcedid']
+
+    @property
+    def role(self):  # pylint: disable=no-self-use
+        """
+        LTI roles
+
+        :return: roles
+        """
+        return self.session.get('roles')
+
+    @staticmethod
+    def is_role(self, role):
+        """
+        Verify if user is in role
+
+        :param: role: role to verify against
+        :return: if user is in role
+        :exception: LTIException if role is unknown
+        """
+        log.debug("is_role %s", role)
+        roles = self.session['roles'].split(',')
+        if role in LTI_ROLES:
+            role_list = LTI_ROLES[role]
+            # find the intersection of the roles
+            roles = set(role_list) & set(roles)
+            is_user_role_there = len(roles) >= 1
+            log.debug(
+                "is_role roles_list=%s role=%s in list=%s", role_list,
+                roles, is_user_role_there
+            )
+            return is_user_role_there
+        else:
+            raise LTIException("Unknown role {}.".format(role))
+
+    def _check_role(self):
+        """
+        Check that user is in role specified as wrapper attribute
+
+        :exception: LTIRoleException if user is not in roles
+        """
+        role = u'any'
+        if 'role' in self.lti_kwargs:
+            role = self.lti_kwargs['role']
+        log.debug(
+            "check_role lti_role=%s decorator_role=%s", self.role, role
+        )
+        if not (role == u'any' or self.is_role(self, role)):
+            raise LTIRoleException('Not authorized.')
+
+    def post_grade(self, grade):
+        """
+        Post grade to LTI consumer using XML
+
+        :param: grade: 0 <= grade <= 1
+        :return: True if post successful and grade valid
+        :exception: LTIPostMessageException if call failed
+        """
+        message_identifier_id = self.message_identifier_id()
+        operation = 'replaceResult'
+        lis_result_sourcedid = self.lis_result_sourcedid
+        # # edX devbox fix
+        score = float(grade)
+        if 0 <= score <= 1.0:
+            xml = generate_request_xml(
+                message_identifier_id, operation, lis_result_sourcedid,
+                score)
+            ret = post_message(self._consumers(), self.key,
+                               self.response_url, xml)
+            if not ret:
+                raise LTIPostMessageException("Post Message Failed")
+            return True
+
+        return False
+
+    def post_grade2(self, grade, user=None, comment=''):
+        """
+        Post grade to LTI consumer using REST/JSON
+        URL munging will is related to:
+        https://openedx.atlassian.net/browse/PLAT-281
+
+        :param: grade: 0 <= grade <= 1
+        :return: True if post successful and grade valid
+        :exception: LTIPostMessageException if call failed
+        """
+        content_type = 'application/vnd.ims.lis.v2.result+json'
+        if user is None:
+            user = self.user_id
+        lti2_url = self.response_url.replace(
+            "/grade_handler",
+            "/lti_2_0_result_rest_handler/user/{}".format(user))
+        score = float(grade)
+        if 0 <= score <= 1.0:
+            body = json.dumps({
+                "@context": "http://purl.imsglobal.org/ctx/lis/v2/Result",
+                "@type": "Result",
+                "resultScore": score,
+                "comment": comment
+            })
+            ret = post_message2(self._consumers(), self.key, lti2_url, body,
+                                method='PUT',
+                                content_type=content_type)
+            if not ret:
+                raise LTIPostMessageException("Post Message Failed")
+            return True
+
+        return False

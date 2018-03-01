@@ -1,13 +1,8 @@
-"""
-Test pylti/test_flask_app.py module
-"""
-from flask import Flask, session
-
-from pylti.flask import lti as lti_flask
-from pylti.common import LTI_SESSION_KEY
+from chalice import Chalice
+from pylti.chalice import lti as lti_chalice
 from pylti.tests.test_common import ExceptionHandler
 
-app = Flask(__name__)  # pylint: disable=invalid-name
+app = Chalice(__name__)
 app_exception = ExceptionHandler()  # pylint: disable=invalid-name
 
 
@@ -20,7 +15,7 @@ def error(exception):
 
 
 @app.route("/unknown_protection")
-@lti_flask(error=error, app=app, request='notreal')
+@lti_chalice(error=error, app=app, request='notreal')
 def unknown_protection(lti):
     # pylint: disable=unused-argument,
     """
@@ -32,26 +27,8 @@ def unknown_protection(lti):
     return "hi"  # pragma: no cover
 
 
-@app.route("/no_app")
-@lti_flask(error=error)
-def no_app(lti):
-    # pylint: disable=unused-argument,
-    """
-    Use decorator without specifying LTI, raise exception.
-
-    :param lti: `lti` object
-    """
-    # Check that we have the app in our lti object and raise if we
-    # don't
-    if not lti.lti_kwargs['app']:  # pragma: no cover
-        raise Exception(
-            'The app is null and is not properly getting current_app'
-        )
-    return 'hi'
-
-
 @app.route("/any")
-@lti_flask(error=error, request='any', app=app)
+@lti_chalice(error=error, request='any', app=app)
 def any_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -64,7 +41,7 @@ def any_route(lti):
 
 
 @app.route("/session")
-@lti_flask(error=error, request='session', app=app)
+@lti_chalice(error=error, request='session', app=app)
 def session_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -76,8 +53,8 @@ def session_route(lti):
     return "hi"
 
 
-@app.route("/initial", methods=['GET', 'POST'])
-@lti_flask(error=error, request='initial', app=app)
+@app.route("/initial", methods=['GET'])
+@lti_chalice(error=error, request='initial', app=app)
 def initial_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -89,8 +66,22 @@ def initial_route(lti):
     return "hi"
 
 
+@app.route("/initial", methods=['POST'],
+           content_types=['application/x-www-form-urlencoded'])
+@lti_chalice(error=error, request='initial', app=app)
+def post_form(lti):
+    # pylint: disable=unused-argument,
+    """
+    Access route with 'initial' request.
+
+    :param lti: `lti` object
+    :return: string "hi"
+    """
+    return "hi"
+
+
 @app.route("/name", methods=['GET', 'POST'])
-@lti_flask(error=error, request='initial', app=app)
+@lti_chalice(error=error, request='initial', app=app)
 def name(lti):
     """
     Access route with 'initial' request.
@@ -101,8 +92,8 @@ def name(lti):
     return lti.name
 
 
-@app.route("/initial_staff", methods=['GET', 'POST'])
-@lti_flask(error=error, request='initial', role='staff', app=app)
+@app.route("/initial_staff", methods=['GET'])
+@lti_chalice(error=error, request='initial', role='staff', app=app)
 def initial_staff_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -115,7 +106,7 @@ def initial_staff_route(lti):
 
 
 @app.route("/initial_student", methods=['GET', 'POST'])
-@lti_flask(error=error, request='initial', role='student', app=app)
+@lti_chalice(error=error, request='initial', role='student', app=app)
 def initial_student_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -128,7 +119,7 @@ def initial_student_route(lti):
 
 
 @app.route("/initial_unknown", methods=['GET', 'POST'])
-@lti_flask(error=error, request='initial', role='unknown', app=app)
+@lti_chalice(error=error, request='initial', role='unknown', app=app)
 def initial_unknown_route(lti):
     # pylint: disable=unused-argument,
     """
@@ -140,34 +131,21 @@ def initial_unknown_route(lti):
     return "hi"  # pragma: no cover
 
 
-@app.route("/setup_session")
-def setup_session():
-    """
-    Access 'setup_session' route with 'Student' role and oauth_consumer_key.
+# @app.route("/close_session")
+# @lti_chalice(error=error, request='session', app=app)
+# def logout_route(lti):
+#     """
+#     Access 'close_session' route.
 
-    :return: string "session set"
-    """
-    session[LTI_SESSION_KEY] = True
-    session['oauth_consumer_key'] = '__consumer_key__'
-    session['roles'] = 'Student'
-    return "session set"
-
-
-@app.route("/close_session")
-@lti_flask(error=error, request='session', app=app)
-def logout_route(lti):
-    """
-    Access 'close_session' route.
-
-    :param lti: `lti` object
-    :return: string "session closed"
-    """
-    lti.close_session()
-    return "session closed"
+#     :param lti: `lti` object
+#     :return: string "session closed"
+#     """
+#     lti.close_session()
+#     return "session closed"
 
 
-@app.route("/post_grade/<float:grade>")
-@lti_flask(error=error, request='session', app=app)
+@app.route("/post_grade/{grade}")
+@lti_chalice(error=error, request='initial', app=app)
 def post_grade(grade, lti):
     """
     Access route with 'session' request.
@@ -179,8 +157,8 @@ def post_grade(grade, lti):
     return "grade={}".format(ret)
 
 
-@app.route("/post_grade2/<float:grade>")
-@lti_flask(error=error, request='session', app=app)
+@app.route("/post_grade2/{grade}")
+@lti_chalice(error=error, request='initial', app=app)
 def post_grade2(grade, lti):
     """
     Access route with 'session' request.
@@ -193,8 +171,8 @@ def post_grade2(grade, lti):
 
 
 @app.route("/default_lti")
-@lti_flask
-def default_lti(lti=lti_flask):
+@lti_chalice
+def default_lti(lti=lti_chalice):
     # pylint: disable=unused-argument,
     """
     Make sure default LTI decorator works.

@@ -107,7 +107,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(),
-                         'This page requires a valid oauth session or request')
+                         'Session expired or unavailable')
 
     def test_access_to_oauth_resource_without_authorization_session(self):
         """
@@ -312,7 +312,8 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def generate_launch_request(consumers, url,
                                 lit_outcome_service_url=None,
                                 roles=u'Instructor',
-                                add_params=None):
+                                add_params=None,
+                                include_lti_message_type=False):
         """
         Generate valid basic-lti-launch-request request with options.
         :param consumers: consumer map
@@ -340,8 +341,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                               u'_94173d3e79d145fd8ec2e'
                                               u'83f15836ac8'
                                               u'/handler_noauth/'
-                                              u'grade_handler'),
-                  'lti_message_type': u'basic-lti-launch-request'}
+                                              u'grade_handler')}
+
+        if include_lti_message_type:
+            params['lti_message_type'] = u'basic-lti-launch-request'
 
         if roles is not None:
             params['roles'] = roles
@@ -368,7 +371,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         url = 'http://localhost/any?'
         new_url = self.generate_launch_request(self.consumers, url)
-        self.app.get(new_url)
+        self.app.post(new_url)
         self.assertFalse(self.has_exception())
 
     def test_access_to_oauth_resource_any_norole(self):
@@ -377,7 +380,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         url = 'http://localhost/any?'
         new_url = self.generate_launch_request(self.consumers, url, roles=None)
-        self.app.get(new_url)
+        self.app.post(new_url)
         self.assertFalse(self.has_exception())
 
     def test_access_to_oauth_resource_any_nonstandard_role(self):
@@ -387,7 +390,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         url = 'http://localhost/any?'
         new_url = self.generate_launch_request(self.consumers, url,
                                                roles=u'ThisIsNotAStandardRole')
-        self.app.get(new_url)
+        self.app.post(new_url)
         self.assertFalse(self.has_exception())
 
     def test_access_to_oauth_resource_invalid(self):

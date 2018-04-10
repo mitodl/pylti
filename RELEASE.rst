@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.6.0
+-------------
+
+- Session variables no longer trump new authentication (#83)
+- Update oauthlib to 2.0.6 (#79)
+
 Version 0.5.1
 -------------
 

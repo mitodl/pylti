@@ -165,7 +165,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         self.localGateway.handle_request(method='GET',
                                          path='/unknown_protection',
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -178,7 +181,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         self.localGateway.handle_request(method='GET',
                                          path='/any',
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -194,7 +200,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         self.localGateway.handle_request(method='GET',
                                          path='/session',
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -210,7 +219,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         self.localGateway.handle_request(method='GET',
                                          path='/initial',
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -263,7 +275,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         self.localGateway.handle_request(method='GET',
                                          path=new_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -277,7 +292,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         (path, body) = new_url.split("?")
         self.localGateway.handle_request(method='POST',
                                          path=path,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body=body)
         self.assertFalse(self.has_exception())
 
@@ -294,7 +312,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                   'host': 'localhost',
+                                                   'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], u'person')
@@ -312,7 +333,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                   'host': 'localhost',
+                                                   'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], u'email@email.com')
@@ -331,7 +355,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                   'host': 'localhost',
+                                                   'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], u'person')
@@ -347,7 +374,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=student_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
 
@@ -356,7 +386,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=learner_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
 
@@ -371,7 +404,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=new_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -386,7 +422,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=admin_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
 
@@ -403,7 +442,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=learner_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -412,7 +454,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=student_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -425,7 +470,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=staff_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
 
@@ -438,7 +486,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         )
         self.localGateway.handle_request(method='GET',
                                          path=unknown_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
 
@@ -467,7 +518,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(self.consumers, url, roles=None)
         self.localGateway.handle_request(method='GET',
                                          path=new_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                             'host': 'localhost',
+                                             'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -481,7 +535,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                                roles=u'ThisIsNotAStandardRole')
         self.localGateway.handle_request(method='GET',
                                          path=new_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -495,7 +552,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         bad_url = "{}&FAIL=TRUE".format(new_url)
         self.localGateway.handle_request(method='GET',
                                          path=bad_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
@@ -540,7 +600,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], "grade=True")
@@ -549,7 +612,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], "grade=False")
@@ -581,7 +647,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertTrue(self.has_exception())
         self.assertEqual(ret['body'], "error")
@@ -631,7 +700,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], "grade=True")
@@ -640,7 +712,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertFalse(self.has_exception())
         self.assertEqual(ret['body'], "grade=False")
@@ -670,7 +745,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(consumers, url)
         ret = self.localGateway.handle_request(method='GET',
                                                path=new_url,
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         self.assertTrue(self.has_exception())
         self.assertEqual(ret['body'], "error")
@@ -683,7 +761,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         new_url = self.generate_launch_request(self.consumers, url)
         self.localGateway.handle_request(method='GET',
                                          path=new_url,
-                                         headers={'host': 'localhost'},
+                                         headers={
+                                            'host': 'localhost',
+                                            'x-forwarded-proto': 'https'
+                                         },
                                          body='')
         self.assertFalse(self.has_exception())
 
@@ -696,7 +777,10 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         # pylint: disable=maybe-no-member
         ret = self.localGateway.handle_request(method='GET',
                                                path='/default_lti',
-                                               headers={'host': 'localhost'},
+                                               headers={
+                                                  'host': 'localhost',
+                                                  'x-forwarded-proto': 'https'
+                                               },
                                                body='')
         print(ret)
         self.assertEqual(ret['statusCode'], 500)

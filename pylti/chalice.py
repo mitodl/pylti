@@ -90,10 +90,10 @@ class LTI(LTIBase):
         log.debug('verify_request?')
         try:
             # Chalice does not have a url property therefore building it.
+            protocol = request.headers.get('x-forwarded-proto', 'http')
             hostname = request.headers['host']
             path = request.context['path']
-            # TODO: Chalice local is not setting the "path"
-            url = urlunparse(("https", hostname, path, "", "", ""))
+            url = urlunparse((protocol, hostname, path, "", "", ""))
             verify_request_common(self._consumers(), url,
                                   request.method, request.headers,
                                   params)

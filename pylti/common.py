@@ -55,6 +55,7 @@ LTI_REQUEST_TYPE = [u'any', u'initial', u'session']
 def default_error(exception=None):
     """Render simple error page.  This should be overidden in applications."""
     # pylint: disable=unused-argument
+    log.exception("There was an LTI communication error")
     return "There was an LTI communication error", 500
 
 

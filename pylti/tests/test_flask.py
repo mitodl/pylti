@@ -260,9 +260,9 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Deny access if role not defined.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial_unknown?'
+        url = 'http://localhost/initial_staff?'
         admin_url = self.generate_launch_request(
-            consumers, url, roles='Administrator'
+            consumers, url, roles='FooBar'
         )
 
         self.app.get(admin_url)
@@ -291,7 +291,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_student_as_staff(self):
         """Verify staff doesn't have access to student only."""
         consumers = self.consumers
-        url = 'http://localhost/initial_unknown?'
+        url = 'http://localhost/initial_student?'
         staff_url = self.generate_launch_request(
             consumers, url, roles='Staff'
         )
@@ -301,7 +301,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_student_as_unknown(self):
         """Verify staff doesn't have access to student only."""
         consumers = self.consumers
-        url = 'http://localhost/initial_unknown?'
+        url = 'http://localhost/initial_student?'
         unknown_url = self.generate_launch_request(
             consumers, url, roles='FooBar'
         )

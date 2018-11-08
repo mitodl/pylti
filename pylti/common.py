@@ -280,7 +280,12 @@ def verify_request_common(consumers, url, method, headers, params):
         SignatureMethod_HMAC_SHA1_Unicode())
 
     # Check header for SSL before selecting the url
-    if headers.get('X-Forwarded-Proto', 'http') == 'https':
+    if (
+        headers.get(
+            "X-Forwarded-Proto",
+            headers.get("HTTP_X_FORWARDED_PROTO", "http"),
+        ) == "https"
+    ):
         url = url.replace('http:', 'https:', 1)
 
     oauth_request = Request_Fix_Duplicate.from_request(

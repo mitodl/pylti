@@ -143,6 +143,22 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                     headers, verify_params)
         self.assertTrue(ret)
 
+    def test_verify_request_common_via_proxy_wsgi_syntax(self):
+        """
+        verify_request_common succeeds on valid request via proxy with
+        wsgi syntax for headers
+        """
+        headers = dict()
+        headers['HTTP_X_FORWARDED_PROTO'] = 'https'
+        orig_url = 'https://localhost:5000/?'
+        consumers, method, url, verify_params, _ = (
+            self.generate_oauth_request(url_to_sign=orig_url)
+        )
+
+        ret = verify_request_common(consumers, url, method,
+                                    headers, verify_params)
+        self.assertTrue(ret)
+
     def test_verify_request_common_no_oauth_fields(self):
         """
         verify_request_common fails on missing authentication

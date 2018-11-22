@@ -262,7 +262,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial_staff?'
         admin_url = self.generate_launch_request(
-            consumers, url, roles='FooBar'
+            consumers, url, roles='Foo'
         )
 
         self.app.get(admin_url)
@@ -293,7 +293,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = self.consumers
         url = 'http://localhost/initial_student?'
         staff_url = self.generate_launch_request(
-            consumers, url, roles='Staff'
+            consumers, url, roles='Instructor'
         )
         self.app.get(staff_url)
         self.assertTrue(self.has_exception())

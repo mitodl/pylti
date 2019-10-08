@@ -546,7 +546,6 @@ class LTIBase(object):
         """
         return self.session.get('roles')
 
-    @staticmethod
     def is_role(self, role):
         """
         Verify if user is in role

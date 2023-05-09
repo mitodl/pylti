@@ -114,6 +114,11 @@ class LTIRequestValidator(RequestValidator):
         # some very loose guidelines on how long a key should be
         return 3, 1000
 
+    @property
+    def nonce_length(self):
+        # some very loose guidelines on how long a nonce should be
+        return 8, 1000
+
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
                                      request, request_token=None, access_token=None):
         """Validates that the timestamp is valid.

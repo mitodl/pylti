@@ -10,4 +10,3 @@ pytest-flakes
 requests-oauthlib
 semantic-version
 mock
-six

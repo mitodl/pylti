@@ -54,7 +54,7 @@ try:
                                 "pytest-flakes==4.*", "pytest==7.*",
                                 "httpretty==1.*", "chalice==1.*", "flask==2.*",
                                 "oauthlib==3.*", "semantic_version==2.*",
-                                "mock==5.*", "six==1.*"],
+                                "mock==5.*"],
                  cmdclass={"test": PyTest},
                  install_requires=["oauthlib==3.*", "requests-oauthlib==1.*"],
                  include_package_data=True,

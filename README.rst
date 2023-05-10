@@ -48,7 +48,6 @@ Development dependencies:
 * pytest-cov 4.x
 * pytest-flakes 4.x
 * semantic-version 2.x
-* six 1.10.0+
 * sphinx 1.2.3
 
 Documentation_ is available on readthedocs.

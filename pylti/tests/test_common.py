@@ -8,7 +8,7 @@ import semantic_version
 import httpretty
 import oauthlib.oauth1
 
-from six.moves.urllib.parse import urlencode, urlparse, parse_qs
+from urllib.parse import urlencode, urlparse, parse_qs
 
 import pylti
 from pylti.common import (

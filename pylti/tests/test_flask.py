@@ -9,7 +9,7 @@ import httpretty
 import mock
 import oauthlib.oauth1
 
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from pylti.common import LTIException
 from pylti.flask import LTI

@@ -119,6 +119,14 @@ class LTIRequestValidator(RequestValidator):
         # some very loose guidelines on how long a nonce should be
         return 8, 1000
 
+    @property
+    def dummy_client(self):
+        """Dummy client used when an invalid client key is supplied.
+
+        :returns: The dummy client key string.
+        """
+        return "__dummy_invalid_client_key"
+
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
                                      request, request_token=None, access_token=None):
         """Validates that the timestamp is valid.

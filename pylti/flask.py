@@ -62,7 +62,7 @@ class LTI(LTIBase):
         log.debug(params)
         log.debug('verify_request?')
         try:
-            verify_request_common(self._consumers(), flask_request.url,
+            verify_request_common(self._consumers(), flask_request.base_url,
                                   flask_request.method, flask_request.headers,
                                   params)
             log.debug('verify_request success')

@@ -8,11 +8,10 @@ import semantic_version
 import httpretty
 import oauthlib.oauth1
 
-from six.moves.urllib.parse import urlencode, urlparse, parse_qs
+from urllib.parse import urlencode, urlparse, parse_qs
 
 import pylti
 from pylti.common import (
-    LTIOAuthServer,
     verify_request_common,
     LTIException,
     post_message,
@@ -86,36 +85,6 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         semantic_version.Version(pylti.__version__)
 
-    def test_lti_oauth_server(self):
-        """
-        Tests that LTIOAuthServer works
-        """
-        consumers = {
-            "key1": {"secret": "secret1"},
-            "key2": {"secret": "secret2"},
-            "key3": {"secret": "secret3"},
-            "keyNS": {"test": "test"},
-            "keyWCert": {"secret": "secret", "cert": "cert"},
-        }
-        store = LTIOAuthServer(consumers)
-        self.assertEqual(store.lookup_consumer("key1").secret, "secret1")
-        self.assertEqual(store.lookup_consumer("key2").secret, "secret2")
-        self.assertEqual(store.lookup_consumer("key3").secret, "secret3")
-        self.assertEqual(store.lookup_cert("keyWCert"), "cert")
-        self.assertIsNone(store.lookup_consumer("key4"))
-        self.assertIsNone(store.lookup_cert("key4"))
-        self.assertIsNone(store.lookup_consumer("keyNS"))
-        self.assertIsNone(store.lookup_cert("keyNS"))
-
-    def test_lti_oauth_server_no_consumers(self):
-        """
-        If consumers are not given it there are no consumer to return.
-        """
-
-        store = LTIOAuthServer(None)
-        self.assertIsNone(store.lookup_consumer("key1"))
-        self.assertIsNone(store.lookup_cert("key1"))
-
     def test_verify_request_common(self):
         """
         verify_request_common succeeds on valid request
@@ -134,7 +103,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         headers = dict()
         headers['X-Forwarded-Proto'] = 'https'
-        orig_url = 'https://localhost:5000/?'
+        orig_url = 'https://localhost:5000/'
         consumers, method, url, verify_params, _ = (
             self.generate_oauth_request(url_to_sign=orig_url)
         )
@@ -150,7 +119,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         headers = dict()
         headers['HTTP_X_FORWARDED_PROTO'] = 'https'
-        orig_url = 'https://localhost:5000/?'
+        orig_url = 'https://localhost:5000/'
         consumers, method, url, verify_params, _ = (
             self.generate_oauth_request(url_to_sign=orig_url)
         )
@@ -177,7 +146,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
-        url = 'http://localhost:5000/?'
+        url = 'https://localhost:5000/'
         method = 'GET'
         headers = dict()
         params = dict()
@@ -272,7 +241,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
         consumers = {
             "__consumer_key__": {"secret": "__lti_secret__"}
         }
-        url = url_to_sign or 'http://localhost:5000/?'
+        url = url_to_sign or 'https://localhost:5000/'
         method = 'GET'
         params = {'resource_link_id': u'edge.edx.org-i4x-MITx-ODL_ENG-'
                                       u'lti-94173d3e79d145fd8ec2e83f15836ac8',
@@ -300,7 +269,7 @@ lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>
                                         SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.
                                         SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(url, urlparams))
+        signature = client.sign("{}?{}".format(url, urlparams))
 
         url_parts = urlparse(signature[0])
         query_string = parse_qs(url_parts.query, keep_blank_values=True)

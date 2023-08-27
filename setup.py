@@ -9,8 +9,8 @@ from __future__ import print_function
 import os
 import sys
 
-if sys.version_info < (2, 7):
-    error = "ERROR: PyLTI requires Python 2.7+ ... exiting."
+if sys.version_info < (3, 7):
+    error = "ERROR: PyLTI requires Python 3.7+ ... exiting."
     print(error, file=sys.stderr)
     sys.exit(1)
 
@@ -22,12 +22,10 @@ try:
         user_options = testcommand.user_options[:]
         user_options += [
             ('coverage', 'C', 'Produce a coverage report for PyLTI'),
-            ('pep8', 'P', 'Produce a pep8 report for PyLTI'),
             ('flakes', 'F', 'Produce a flakes report for PyLTI'),
 
         ]
         coverage = None
-        pep8 = None
         flakes = None
         test_suite = False
         test_args = []
@@ -42,8 +40,6 @@ try:
             if self.coverage:
                 self.test_args.append('--cov')
                 self.test_args.append('pylti')
-            if self.pep8:
-                self.test_args.append('--pep8')
             if self.flakes:
                 self.test_args.append('--flakes')
 
@@ -54,13 +50,13 @@ try:
             sys.exit(errno)
 
     extra = dict(test_suite="pylti.tests",
-                 tests_require=["pytest-cov>=2.3.0", "pytest-pep8>=1.0.6",
-                                "pytest-flakes>=1.0.1", "pytest>=2.9.2",
-                                "httpretty>=0.8.3", "flask>=0.10.1",
-                                "oauthlib>=0.6.3", "semantic_version>=2.3.1",
-                                "mock==1.0.1"],
+                 tests_require=["pytest-cov==4.*",
+                                "pytest-flakes==4.*", "pytest==7.*",
+                                "httpretty==1.*", "chalice==1.*", "flask==2.*",
+                                "oauthlib==3.*", "semantic_version==2.*",
+                                "mock==5.*"],
                  cmdclass={"test": PyTest},
-                 install_requires=["oauth2>=1.9.0.post1", "httplib2>=0.9", "six>=1.10.0"],
+                 install_requires=["oauthlib==3.*", "requests-oauthlib==1.*"],
                  include_package_data=True,
                  zip_safe=False)
 except ImportError as err:

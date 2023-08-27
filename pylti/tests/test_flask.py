@@ -9,7 +9,7 @@ import httpretty
 import mock
 import oauthlib.oauth1
 
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from pylti.common import LTIException
 from pylti.flask import LTI
@@ -127,7 +127,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(),
-                         'This page requires a valid oauth session or request')
+                         'OAuth error: Error while validating request.')
 
     def test_access_to_oauth_resource_without_authorization_initial_post(self):
         """
@@ -137,7 +137,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(),
-                         'This page requires a valid oauth session or request')
+                         'OAuth error: Error while validating request.')
 
     def test_access_to_oauth_resource_in_session(self):
         """
@@ -169,7 +169,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Accessing oauth_resource.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(consumers, url)
 
         self.app.get(new_url)
@@ -181,7 +181,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         # pylint: disable=maybe-no-member
         consumers = self.consumers
-        url = 'http://localhost/name?'
+        url = 'https://localhost/name'
         add_params = {u'lis_person_sourcedid': u'person'}
         new_url = self.generate_launch_request(
             consumers, url, add_params=add_params
@@ -197,7 +197,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         # pylint: disable=maybe-no-member
         consumers = self.consumers
-        url = 'http://localhost/name?'
+        url = 'https://localhost/name'
         add_params = {u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(
             consumers, url, add_params=add_params
@@ -213,7 +213,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         # pylint: disable=maybe-no-member
         consumers = self.consumers
-        url = 'http://localhost/name?'
+        url = 'https://localhost/name'
         add_params = {u'lis_person_sourcedid': u'person',
                       u'lis_person_contact_email_primary': u'email@email.com'}
         new_url = self.generate_launch_request(
@@ -229,7 +229,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Deny access if user not in role.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial_staff?'
+        url = 'https://localhost/initial_staff'
         student_url = self.generate_launch_request(
             consumers, url, roles='Student'
         )
@@ -247,7 +247,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Allow access if user in role.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial_staff?'
+        url = 'https://localhost/initial_staff'
         new_url = self.generate_launch_request(
             consumers, url, roles='Administrator'
         )
@@ -260,7 +260,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Deny access if role not defined.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial_staff?'
+        url = 'https://localhost/initial_staff'
         admin_url = self.generate_launch_request(
             consumers, url, roles='Foo'
         )
@@ -273,7 +273,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Verify that the various roles we consider as students are students.
         """
         consumers = self.consumers
-        url = 'http://localhost/initial_student?'
+        url = 'https://localhost/initial_student'
 
         # Learner Role
         learner_url = self.generate_launch_request(
@@ -291,7 +291,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_student_as_staff(self):
         """Verify staff doesn't have access to student only."""
         consumers = self.consumers
-        url = 'http://localhost/initial_student?'
+        url = 'https://localhost/initial_student'
         staff_url = self.generate_launch_request(
             consumers, url, roles='Instructor'
         )
@@ -301,7 +301,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     def test_access_to_oauth_resource_student_as_unknown(self):
         """Verify staff doesn't have access to student only."""
         consumers = self.consumers
-        url = 'http://localhost/initial_student?'
+        url = 'https://localhost/initial_student'
         unknown_url = self.generate_launch_request(
             consumers, url, roles='FooBar'
         )
@@ -360,16 +360,15 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                         SIGNATURE_HMAC,
                                         signature_type=oauthlib.oauth1.
                                         SIGNATURE_TYPE_QUERY)
-        signature = client.sign("{}{}".format(url, urlparams))
+        signature = client.sign("{}?{}".format(url, urlparams))
         signed_url = signature[0]
-        new_url = signed_url[len('http://localhost'):]
-        return new_url
+        return signed_url
 
     def test_access_to_oauth_resource_any(self):
         """
         Test access to LTI protected resources.
         """
-        url = 'http://localhost/any?'
+        url = 'https://localhost/any'
         new_url = self.generate_launch_request(self.consumers, url)
         self.app.post(new_url)
         self.assertFalse(self.has_exception())
@@ -378,7 +377,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Test access to LTI protected resources.
         """
-        url = 'http://localhost/any?'
+        url = 'https://localhost/any'
         new_url = self.generate_launch_request(self.consumers, url, roles=None)
         self.app.post(new_url)
         self.assertFalse(self.has_exception())
@@ -387,7 +386,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Test access to LTI protected resources.
         """
-        url = 'http://localhost/any?'
+        url = 'https://localhost/any'
         new_url = self.generate_launch_request(self.consumers, url,
                                                roles=u'ThisIsNotAStandardRole')
         self.app.post(new_url)
@@ -398,13 +397,13 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         Deny access to LTI protected resources
         on man in the middle attack.
         """
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(self.consumers, url)
 
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
-        self.assertEqual(self.get_exception_as_string(),
+        self.assertEqual(self.get_exception_as_string()[:45],
                          'OAuth error: Please check your key and secret')
 
     def test_access_to_oauth_resource_invalid_after_session_setup(self):
@@ -415,13 +414,13 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.app.get('/session')
         self.assertFalse(self.has_exception())
 
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(self.consumers, url)
 
         self.app.get("{}&FAIL=TRUE".format(new_url))
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
-        self.assertEqual(self.get_exception_as_string(),
+        self.assertEqual(self.get_exception_as_string()[:45],
                          'OAuth error: Please check your key and secret')
 
     @httpretty.activate
@@ -438,7 +437,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         httpretty.register_uri(httpretty.POST, uri, body=self.request_callback)
 
         consumers = self.consumers
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(consumers, url)
 
         ret = self.app.get(new_url)
@@ -473,7 +472,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         httpretty.register_uri(httpretty.POST, uri, body=request_callback)
 
         consumers = self.consumers
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(consumers, url)
         ret = self.app.get(new_url)
         self.assertFalse(self.has_exception())
@@ -493,7 +492,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
 
         httpretty.register_uri(httpretty.POST, uri, body=self.request_callback)
 
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(
             self.consumers, url, lit_outcome_service_url=uri
         )
@@ -522,7 +521,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         httpretty.register_uri(httpretty.PUT, uri, body=self.request_callback)
 
         consumers = self.consumers
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(consumers, url)
 
         ret = self.app.get(new_url)
@@ -564,7 +563,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         httpretty.register_uri(httpretty.PUT, uri, body=request_callback)
 
         consumers = self.consumers
-        url = 'http://localhost/initial?'
+        url = 'https://localhost/initial'
         new_url = self.generate_launch_request(consumers, url)
 
         ret = self.app.get(new_url)
@@ -588,7 +587,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         """
         Verify default decorator works.
         """
-        url = 'http://localhost/default_lti?'
+        url = 'https://localhost/default_lti'
         new_url = self.generate_launch_request(self.consumers, url)
         self.app.get(new_url)
         self.assertFalse(self.has_exception())

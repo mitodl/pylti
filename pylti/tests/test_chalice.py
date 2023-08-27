@@ -227,7 +227,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(),
-                         'OAuth error: Please check your key and secret')
+                         'OAuth error: Error while validating request.')
 
     def test_access_without_authorization_post_form(self):
         """
@@ -243,7 +243,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
         self.assertEqual(self.get_exception_as_string(),
-                         'OAuth error: Please check your key and secret')
+                         'OAuth error: Error while validating request.')
 
     # DELETE: No sessions in Chalice
     # def test_access_to_oauth_resource_in_session(self):
@@ -559,7 +559,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
                                          body='')
         self.assertTrue(self.has_exception())
         self.assertIsInstance(self.get_exception(), LTIException)
-        self.assertEqual(self.get_exception_as_string(),
+        self.assertEqual(self.get_exception_as_string()[:45],
                          'OAuth error: Please check your key and secret')
 
     # DELETE: Chalice does not support sessions
@@ -577,7 +577,7 @@ edge.edx.org-i4x-StarX-StarX_DEMO-lti-40559041895b4065b2818c23b9cd9da8\
     #     self.app.get("{}&FAIL=TRUE".format(new_url))
     #     self.assertTrue(self.has_exception())
     #     self.assertIsInstance(self.get_exception(), LTIException)
-    #     self.assertEqual(self.get_exception_as_string(),
+    #     self.assertEqual(self.get_exception_as_string()[:45],
     #                      'OAuth error: Please check your key and secret')
 
     # UPDATE: Original established a session and then called post_grade

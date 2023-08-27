@@ -326,13 +326,16 @@ def verify_request_common(consumers, url, method, headers, params):
 
     validator = LTIRequestValidator(consumers)
     endpoint = SignatureOnlyEndpoint(validator)
-    valid, _ = endpoint.validate_request(
+    valid, request = endpoint.validate_request(
         url,
         method,
         body=body,
         headers=headers)
     if not valid:
-        raise LTIException("OAuth error: Please check your key and secret")
+        if request:
+            raise LTIException(f"OAuth error: Please check your key and secret.  key={request.client_key}")
+        else:
+            raise LTIException("OAuth error: Error while validating request.")
 
     return True
 

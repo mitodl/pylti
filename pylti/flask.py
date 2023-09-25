@@ -156,7 +156,7 @@ class LTI(LTIBase):
         session[LTI_SESSION_KEY] = False
 
 
-def lti(app=None, request='any', error=default_error, role='any',
+def lti(app=None, request='any', error=default_error, role='any', url=None,
         *lti_args, **lti_kwargs):
     """
     LTI decorator
@@ -168,6 +168,13 @@ def lti(app=None, request='any', error=default_error, role='any',
     :param: request - Request type from
         :py:attr:`pylti.common.LTI_REQUEST_TYPE`. (default: any)
     :param: roles - LTI Role (default: any)
+    :param: url - This is an optional setting that allows you to set
+        the url directly. For example, if you have a web
+        server as a proxy in front of the Flask server with a url of
+        https://abc.com/app that is mapped to your Flask server url
+        that is at https://abc.com/ then you can use this parameter
+        like this: 	url='https://abc.com/app'
+
     :return: wrapper
     """
 
@@ -185,6 +192,8 @@ def lti(app=None, request='any', error=default_error, role='any',
             Pass LTI reference to function or return error.
             """
             try:
+                if url:
+                    flask_request.url = url
                 the_lti = LTI(lti_args, lti_kwargs)
                 the_lti.verify()
                 the_lti._check_role()  # pylint: disable=protected-access

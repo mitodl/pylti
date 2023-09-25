@@ -263,6 +263,20 @@ imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0\
 <imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>\
 lis_result_sourcedid</sourcedId></sourcedGUID></resultRecord></operationRequest>\
 </imsx_POXBody></imsx_POXEnvelopeRequest>""")
+        xml = generate_request_xml('message_identifier_id', 'operation',
+                                   'lis_result_sourcedid', 'score',
+                                   'https://somelaunchurl/')
+        self.assertEqual(xml, """<?xml version='1.0' encoding='utf-8'?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/\
+imsoms_v1p0"><imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0\
+</imsx_version><imsx_messageIdentifier>message_identifier_id\
+</imsx_messageIdentifier></imsx_POXRequestHeaderInfo></imsx_POXHeader>\
+<imsx_POXBody><operationRequest><resultRecord><sourcedGUID><sourcedId>\
+lis_result_sourcedid</sourcedId></sourcedGUID><result><resultScore>\
+<language>en</language><textString>score</textString></resultScore>\
+<resultData><ltiLaunchUrl>https://somelaunchurl/</ltiLaunchUrl></resultData>\
+</result></resultRecord></operationRequest></imsx_POXBody>\
+</imsx_POXEnvelopeRequest>""")
 
     @staticmethod
     def generate_oauth_request(url_to_sign=None):

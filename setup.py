@@ -56,7 +56,7 @@ try:
     extra = dict(test_suite="pylti.tests",
                  tests_require=["pytest-cov>=2.3.0", "pytest-pep8>=1.0.6",
                                 "pytest-flakes>=1.0.1", "pytest>=2.9.2",
-                                "httpretty>=0.8.3", "flask>=0.10.1",
+                                "httpretty>=0.8.3", "flask>=0.12.3",
                                 "oauthlib>=0.6.3", "semantic_version>=2.3.1",
                                 "mock==1.0.1"],
                  cmdclass={"test": PyTest},
